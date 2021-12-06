@@ -7,7 +7,7 @@ interface ILQTYStaking {
     // --- Events --
     
     event LQTYTokenAddressSet(address _lqtyTokenAddress);
-    event LUSDTokenAddressSet(address _lusdTokenAddress);
+    event PAITokenAddressSet(address _lusdTokenAddress);
     event TroveManagerAddressSet(address _troveManager);
     event BorrowerOperationsAddressSet(address _borrowerOperationsAddress);
     event ActivePoolAddressSet(address _activePoolAddress);
