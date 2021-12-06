@@ -25,13 +25,13 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
     address public stabilityPoolAddress;
     address public defaultPoolAddress;
     uint256 internal ETH;  // deposited ether tracker
-    uint256 internal LUSDDebt;
+    uint256 internal PAIDebt;
 
     // --- Events ---
 
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event ActivePoolLUSDDebtUpdated(uint _LUSDDebt);
+    event ActivePoolPAIDebtUpdated(uint _PAIDebt);
     event ActivePoolETHBalanceUpdated(uint _ETH);
 
     // --- Contract setters ---
@@ -74,8 +74,8 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
         return ETH;
     }
 
-    function getLUSDDebt() external view override returns (uint) {
-        return LUSDDebt;
+    function getPAIDebt() external view override returns (uint) {
+        return PAIDebt;
     }
 
     // --- Pool functionality ---
@@ -90,16 +90,16 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
         require(success, "ActivePool: sending ETH failed");
     }
 
-    function increaseLUSDDebt(uint _amount) external override {
+    function increasePAIDebt(uint _amount) external override {
         _requireCallerIsBOorTroveM();
-        LUSDDebt  = LUSDDebt.add(_amount);
-        ActivePoolLUSDDebtUpdated(LUSDDebt);
+        PAIDebt  = PAIDebt.add(_amount);
+        ActivePoolPAIDebtUpdated(PAIDebt);
     }
 
-    function decreaseLUSDDebt(uint _amount) external override {
+    function decreasePAIDebt(uint _amount) external override {
         _requireCallerIsBOorTroveMorSP();
-        LUSDDebt = LUSDDebt.sub(_amount);
-        ActivePoolLUSDDebtUpdated(LUSDDebt);
+        PAIDebt = PAIDebt.sub(_amount);
+        ActivePoolPAIDebtUpdated(PAIDebt);
     }
 
     // --- 'require' functions ---

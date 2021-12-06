@@ -449,15 +449,15 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     }
 
     // Issue the specified amount of LUSD to _account and increases the total active debt (_netDebtIncrease potentially includes a LUSDFee)
-    function _withdrawLUSD(IActivePool _activePool, IPAIToken _lusdToken, address _account, uint _LUSDAmount, uint _netDebtIncrease) internal {
-        _activePool.increaseLUSDDebt(_netDebtIncrease);
-        _lusdToken.mint(_account, _LUSDAmount);
+    function _withdrawLUSD(IActivePool _activePool, IPAIToken _paiToken, address _account, uint _PAIAmount, uint _netDebtIncrease) internal {
+        _activePool.increasePAIDebt(_netDebtIncrease);
+        _paiToken.mint(_account, _PAIAmount);
     }
 
     // Burn the specified amount of LUSD from _account and decreases the total active debt
-    function _repayLUSD(IActivePool _activePool, IPAIToken _lusdToken, address _account, uint _LUSD) internal {
-        _activePool.decreaseLUSDDebt(_LUSD);
-        _lusdToken.burn(_account, _LUSD);
+    function _repayLUSD(IActivePool _activePool, IPAIToken _paiToken, address _account, uint _PAI) internal {
+        _activePool.decreasePAIDebt(_PAI);
+        _paiToken.burn(_account, _PAI);
     }
 
     // --- 'Require' wrapper functions ---

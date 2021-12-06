@@ -61,7 +61,7 @@ contract DefaultPool is Ownable, CheckContract, IDefaultPool {
         return ETH;
     }
 
-    function getLUSDDebt() external view override returns (uint) {
+    function getPAIDebt() external view override returns (uint) {
         return LUSDDebt;
     }
 
@@ -78,13 +78,13 @@ contract DefaultPool is Ownable, CheckContract, IDefaultPool {
         require(success, "DefaultPool: sending ETH failed");
     }
 
-    function increaseLUSDDebt(uint _amount) external override {
+    function increasePAIDebt(uint _amount) external override {
         _requireCallerIsTroveManager();
         LUSDDebt = LUSDDebt.add(_amount);
         emit DefaultPoolLUSDDebtUpdated(LUSDDebt);
     }
 
-    function decreaseLUSDDebt(uint _amount) external override {
+    function decreasePAIDebt(uint _amount) external override {
         _requireCallerIsTroveManager();
         LUSDDebt = LUSDDebt.sub(_amount);
         emit DefaultPoolLUSDDebtUpdated(LUSDDebt);

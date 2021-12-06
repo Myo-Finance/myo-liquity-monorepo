@@ -406,8 +406,8 @@ contract EchidnaTester {
         uint totalSupply = lusdToken.totalSupply();
         uint gasPoolBalance = lusdToken.balanceOf(address(gasPool));
 
-        uint activePoolBalance = activePool.getLUSDDebt();
-        uint defaultPoolBalance = defaultPool.getLUSDDebt();
+        uint activePoolBalance = activePool.getPAIDebt();
+        uint defaultPoolBalance = defaultPool.getPAIDebt();
         if (totalSupply != activePoolBalance + defaultPoolBalance) {
             return false;
         }
