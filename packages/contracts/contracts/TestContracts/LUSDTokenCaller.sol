@@ -2,12 +2,12 @@
 
 pragma solidity 0.6.11;
 
-import "../Interfaces/ILUSDToken.sol";
+import "../Interfaces/IPAIToken.sol";
 
 contract LUSDTokenCaller {
-    ILUSDToken LUSD;
+    IPAIToken LUSD;
 
-    function setLUSD(ILUSDToken _LUSD) external {
+    function setLUSD(IPAIToken _LUSD) external {
         LUSD = _LUSD;
     }
 
