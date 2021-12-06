@@ -8,7 +8,7 @@ interface IPool {
     // --- Events ---
     
     event ETHBalanceUpdated(uint _newBalance);
-    event LUSDBalanceUpdated(uint _newBalance);
+    event PAIBalanceUpdated(uint _newBalance);
     event ActivePoolAddressChanged(address _newActivePoolAddress);
     event DefaultPoolAddressChanged(address _newDefaultPoolAddress);
     event StabilityPoolAddressChanged(address _newStabilityPoolAddress);
