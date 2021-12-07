@@ -9,10 +9,10 @@ import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 
 /*
- * The Default Pool holds the ETH and LUSD debt (but not LUSD tokens) from liquidations that have been redistributed
+ * The Default Pool holds the ETH and PAI debt (but not PAI tokens) from liquidations that have been redistributed
  * to active troves but not yet "applied", i.e. not yet recorded on a recipient active trove's struct.
  *
- * When a trove makes an operation that applies its pending ETH and LUSD debt, its pending ETH and LUSD debt is moved
+ * When a trove makes an operation that applies its pending ETH and PAI debt, its pending ETH and PAI debt is moved
  * from the Default Pool to the Active Pool.
  */
 contract DefaultPool is Ownable, CheckContract, IDefaultPool {
@@ -23,10 +23,10 @@ contract DefaultPool is Ownable, CheckContract, IDefaultPool {
     address public troveManagerAddress;
     address public activePoolAddress;
     uint256 internal ETH;  // deposited ETH tracker
-    uint256 internal LUSDDebt;  // debt
+    uint256 internal PAIDebt;  // debt
 
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event DefaultPoolLUSDDebtUpdated(uint _LUSDDebt);
+    event DefaultPoolPAIDebtUpdated(uint _PAIDebt);
     event DefaultPoolETHBalanceUpdated(uint _ETH);
 
     // --- Dependency setters ---
@@ -62,7 +62,7 @@ contract DefaultPool is Ownable, CheckContract, IDefaultPool {
     }
 
     function getPAIDebt() external view override returns (uint) {
-        return LUSDDebt;
+        return PAIDebt;
     }
 
     // --- Pool functionality ---
@@ -80,14 +80,14 @@ contract DefaultPool is Ownable, CheckContract, IDefaultPool {
 
     function increasePAIDebt(uint _amount) external override {
         _requireCallerIsTroveManager();
-        LUSDDebt = LUSDDebt.add(_amount);
-        emit DefaultPoolLUSDDebtUpdated(LUSDDebt);
+        PAIDebt = PAIDebt.add(_amount);
+        emit DefaultPoolPAIDebtUpdated(PAIDebt);
     }
 
     function decreasePAIDebt(uint _amount) external override {
         _requireCallerIsTroveManager();
-        LUSDDebt = LUSDDebt.sub(_amount);
-        emit DefaultPoolLUSDDebtUpdated(LUSDDebt);
+        PAIDebt = PAIDebt.sub(_amount);
+        emit DefaultPoolPAIDebtUpdated(PAIDebt);
     }
 
     // --- 'require' functions ---
