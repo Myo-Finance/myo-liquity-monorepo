@@ -15,12 +15,12 @@ interface IBorrowerOperations {
     event CollSurplusPoolAddressChanged(address _collSurplusPoolAddress);
     event PriceFeedAddressChanged(address  _newPriceFeedAddress);
     event SortedTrovesAddressChanged(address _sortedTrovesAddress);
-    event PAITokenAddressChanged(address _lusdTokenAddress);
+    event PAITokenAddressChanged(address _paiTokenAddress);
     event LQTYStakingAddressChanged(address _lqtyStakingAddress);
 
     event TroveCreated(address indexed _borrower, uint arrayIndex);
     event TroveUpdated(address indexed _borrower, uint _debt, uint _coll, uint stake, uint8 operation);
-    event BorrowingFeePaid(address indexed _borrower, uint _LUSDFee);
+    event BorrowingFeePaid(address indexed _borrower, uint _PAIFee);
 
     // --- Functions ---
 
@@ -33,21 +33,21 @@ interface IBorrowerOperations {
         address _collSurplusPoolAddress,
         address _priceFeedAddress,
         address _sortedTrovesAddress,
-        address _lusdTokenAddress,
+        address _paiTokenAddress,
         address _lqtyStakingAddress
     ) external;
 
-    function openTrove(uint _maxFee, uint _LUSDAmount, address _upperHint, address _lowerHint) external payable;
+    function openTrove(uint _maxFee, uint _PAIAmount, address _upperHint, address _lowerHint) external;
 
-    function addColl(address _upperHint, address _lowerHint) external payable;
+    function addColl(uint _collAmount, address _upperHint, address _lowerHint) external;
 
-    function moveETHGainToTrove(address _user, address _upperHint, address _lowerHint) external payable;
+    function moveCollateralGainToTrove(address _user, uint _collAmount, address _upperHint, address _lowerHint) external;
 
-    function withdrawColl(uint _amount, address _upperHint, address _lowerHint) external;
+    function withdrawColl(uint _collAmount, address _upperHint, address _lowerHint) external;
 
-    function withdrawLUSD(uint _maxFee, uint _amount, address _upperHint, address _lowerHint) external;
+    function withdrawPAI(uint _maxFee, uint _PAIAmount, address _upperHint, address _lowerHint) external;
 
-    function repayLUSD(uint _amount, address _upperHint, address _lowerHint) external;
+    function repayPAI(uint _PAIAmount, address _upperHint, address _lowerHint) external;
 
     function closeTrove() external;
 

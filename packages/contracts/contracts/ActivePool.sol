@@ -3,6 +3,7 @@
 pragma solidity 0.6.11;
 
 import './Interfaces/IActivePool.sol';
+import './Dependencies/IERC20.sol';
 import "./Dependencies/SafeMath.sol";
 import "./Dependencies/Ownable.sol";
 import "./Dependencies/CheckContract.sol";
@@ -24,8 +25,9 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
     address public troveManagerAddress;
     address public stabilityPoolAddress;
     address public defaultPoolAddress;
-    uint256 internal ETH;  // deposited ether tracker
+    address public collateralToken;
     uint256 internal PAIDebt;
+
 
     // --- Events ---
 
@@ -40,7 +42,8 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
         address _borrowerOperationsAddress,
         address _troveManagerAddress,
         address _stabilityPoolAddress,
-        address _defaultPoolAddress
+        address _defaultPoolAddress,
+        address _collateralTokenAddress
     )
         external
         onlyOwner
@@ -49,16 +52,19 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
         checkContract(_troveManagerAddress);
         checkContract(_stabilityPoolAddress);
         checkContract(_defaultPoolAddress);
+        checkContract(_collateralTokenAddress);
 
         borrowerOperationsAddress = _borrowerOperationsAddress;
         troveManagerAddress = _troveManagerAddress;
         stabilityPoolAddress = _stabilityPoolAddress;
         defaultPoolAddress = _defaultPoolAddress;
+        collateralToken = _collateralTokenAddress;
 
         emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
         emit TroveManagerAddressChanged(_troveManagerAddress);
         emit StabilityPoolAddressChanged(_stabilityPoolAddress);
         emit DefaultPoolAddressChanged(_defaultPoolAddress);
+        emit CollateralTokenAddressChanged(_collateralTokenAddress);
 
         _renounceOwnership();
     }
@@ -70,8 +76,8 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
     *
     *Not necessarily equal to the the contract's raw ETH balance - ether can be forcibly sent to contracts.
     */
-    function getETH() external view override returns (uint) {
-        return ETH;
+    function getCollateral() external view override returns (uint) {
+        return IERC20(collateralToken).balanceOf(address(this));
     }
 
     function getPAIDebt() external view override returns (uint) {
@@ -80,14 +86,13 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
 
     // --- Pool functionality ---
 
-    function sendETH(address _account, uint _amount) external override {
+    function sendCollateral(address _account, uint _amount) external override {
         _requireCallerIsBOorTroveMorSP();
-        ETH = ETH.sub(_amount);
-        emit ActivePoolETHBalanceUpdated(ETH);
-        emit EtherSent(_account, _amount);
+        emit ActivePoolCollateralBalanceUpdated(_amount);
+        emit CollateralSent(_account, _amount);
 
-        (bool success, ) = _account.call{ value: _amount }("");
-        require(success, "ActivePool: sending ETH failed");
+        bool success = IERC20(collateralToken).transfer(_account, _amount);
+        require(success, "ActivePool: sending Collateral failed");
     }
 
     function increasePAIDebt(uint _amount) external override {
@@ -129,8 +134,6 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
     // --- Fallback function ---
 
     receive() external payable {
-        _requireCallerIsBorrowerOperationsOrDefaultPool();
-        ETH = ETH.add(msg.value);
-        emit ActivePoolETHBalanceUpdated(ETH);
+        revert();
     }
 }

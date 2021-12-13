@@ -55,7 +55,7 @@ interface ITroveManager is ILiquityBase {
     ) external;
 
     function stabilityPool() external view returns (IStabilityPool);
-    function lusdToken() external view returns (IPAIToken);
+    function paiToken() external view returns (IPAIToken);
     function lqtyToken() external view returns (ILQTYToken);
     function lqtyStaking() external view returns (ILQTYStaking);
 
