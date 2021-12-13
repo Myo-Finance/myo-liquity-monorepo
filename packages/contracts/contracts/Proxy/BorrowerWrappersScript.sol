@@ -123,7 +123,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
         // Top up trove and get more LUSD, keeping ICR constant
         if (gainedCollateral > 0) {
             _requireUserHasTrove(address(this));
-            netLUSDAmount = _getNetLUSDAmount(gainedCollateral);
+            netLUSDAmount = _getNetPAIAmount(gainedCollateral);
             borrowerOperations.adjustTrove{ value: gainedCollateral }(_maxFee, 0, netLUSDAmount, true, _upperHint, _lowerHint);
         }
 
