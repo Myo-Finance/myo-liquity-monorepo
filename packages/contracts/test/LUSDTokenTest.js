@@ -44,7 +44,7 @@ const getPermitDigest = ( name, address, chainId, version,
     ]))
 }
 
-contract('LUSDToken', async accounts => {
+contract('PAIToken', async accounts => {
   const [owner, alice, bob, carol, dennis] = accounts;
 
   const [bountyAddress, lpRewardsAddress, multisig] = accounts.slice(997, 1000)
@@ -122,12 +122,12 @@ contract('LUSDToken', async accounts => {
 
     it("name(): returns the token's name", async () => {
       const name = await lusdTokenTester.name()
-      assert.equal(name, "LUSD Stablecoin")
+      assert.equal(name, "PAI Stablecoin")
     })
 
     it("symbol(): returns the token's symbol", async () => {
       const symbol = await lusdTokenTester.symbol()
-      assert.equal(symbol, "LUSD")
+      assert.equal(symbol, "PAI")
     })
 
     it("decimal(): returns the number of decimal digits used", async () => {

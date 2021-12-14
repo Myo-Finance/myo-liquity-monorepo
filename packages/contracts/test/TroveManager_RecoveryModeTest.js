@@ -9,7 +9,7 @@ const mv = testHelpers.MoneyValues
 const timeValues = testHelpers.TimeValues
 
 const TroveManagerTester = artifacts.require("./TroveManagerTester")
-const LUSDToken = artifacts.require("./LUSDToken.sol")
+const LUSDToken = artifacts.require("./PAIToken.sol")
 
 contract('TroveManager - in Recovery Mode', async accounts => {
   const _1_Ether = web3.utils.toWei('1', 'ether')
