@@ -426,5 +426,26 @@ class DeploymentHelper {
   static async connectUnipool(uniPool, LQTYContracts, uniswapPairAddr, duration) {
     await uniPool.setParams(LQTYContracts.lqtyToken.address, uniswapPairAddr, duration)
   }
+
+  static async connectERC20Collateral(erc20CollateralAddress) {
+
+    ActivePool
+    BorrowerOperations
+    CollSurplusPool
+    DefaultPool
+    StabilityPool
+    LQTYStaking
+    BorrowerOperationsScript
+    BorrowerWrappersScript
+    ActivePoolTester
+    BorrowerOperationsTester
+    DefaultPoolTester
+    Destructible
+    EchidnaProxy
+    EchidnaTester
+    StabilityPoolTester
+    
+
+  }
 }
 module.exports = DeploymentHelper

@@ -347,7 +347,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         _repayLUSD(activePoolCached, lusdTokenCached, gasPoolAddress, LUSD_GAS_COMPENSATION);
 
         // Send the collateral back to the user
-        activePoolCached.sendETH(msg.sender, coll);
+        // activePoolCached.sendETH(msg.sender, coll);
+        activePoolCached.sendERC20(msg.sender, coll);
     }
 
     /**
@@ -438,11 +439,17 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         if (_isCollIncrease) {
             _activePoolAddColl(_activePool, _collChange);
         } else {
-            _activePool.sendETH(_borrower, _collChange);
+            // _activePool.sendETH(_borrower, _collChange);
+            _activePool.sendERC20(_borrower, _collChange);
         }
     }
 
     // Send ETH to Active Pool and increase its recorded ETH balance
+    // function _activePoolAddColl(IActivePool _activePool, uint _amount) internal {
+    //     (bool success, ) = address(_activePool).call{value: _amount}("");
+    //     require(success, "BorrowerOps: Sending ETH to ActivePool failed");
+    // }
+
     function _activePoolAddColl(IActivePool _activePool, uint _amount) internal {
         (bool success, ) = address(_activePool).call{value: _amount}("");
         require(success, "BorrowerOps: Sending ETH to ActivePool failed");

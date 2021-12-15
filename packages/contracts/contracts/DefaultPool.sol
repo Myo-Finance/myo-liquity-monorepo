@@ -7,6 +7,8 @@ import "./Dependencies/SafeMath.sol";
 import "./Dependencies/Ownable.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
+import "./Dependencies/IERC20.sol";
+import "./Dependencies/ERC20Pool.sol";
 
 /*
  * The Default Pool holds the ETH and LUSD debt (but not LUSD tokens) from liquidations that have been redistributed
@@ -15,7 +17,7 @@ import "./Dependencies/console.sol";
  * When a trove makes an operation that applies its pending ETH and LUSD debt, its pending ETH and LUSD debt is moved
  * from the Default Pool to the Active Pool.
  */
-contract DefaultPool is Ownable, CheckContract, IDefaultPool {
+contract DefaultPool is Ownable, CheckContract, ERC20Pool,  IDefaultPool {
     using SafeMath for uint256;
 
     string constant public NAME = "DefaultPool";
@@ -57,9 +59,9 @@ contract DefaultPool is Ownable, CheckContract, IDefaultPool {
     *
     * Not necessarily equal to the the contract's raw ETH balance - ether can be forcibly sent to contracts.
     */
-    function getETH() external view override returns (uint) {
-        return ETH;
-    }
+    // function getETH() external view override returns (uint) {
+    //     return ETH;
+    // }
 
     function getLUSDDebt() external view override returns (uint) {
         return LUSDDebt;
@@ -67,16 +69,29 @@ contract DefaultPool is Ownable, CheckContract, IDefaultPool {
 
     // --- Pool functionality ---
 
-    function sendETHToActivePool(uint _amount) external override {
+    function sendERC20ToActivePool(uint _amount) external override { 
         _requireCallerIsTroveManager();
         address activePool = activePoolAddress; // cache to save an SLOAD
-        ETH = ETH.sub(_amount);
-        emit DefaultPoolETHBalanceUpdated(ETH);
-        emit EtherSent(activePool, _amount);
 
-        (bool success, ) = activePool.call{ value: _amount }("");
-        require(success, "DefaultPool: sending ETH failed");
+        uint balance = IERC20(erc20TokenAddress).balanceOf(address(this)).sub(_amount);
+
+        emit DefaultPoolERC20BalanceUpdated(balance);
+        emit ERC20Sent(activePool, _amount);
+
+        bool success = IERC20(erc20TokenAddress).transfer(activePool, _amount);
+        require(success, "DefaultPool: sending ERC20 failed");
     }
+
+    // function sendETHToActivePool(uint _amount) external override {
+    //     _requireCallerIsTroveManager();
+    //     address activePool = activePoolAddress; // cache to save an SLOAD
+    //     ETH = ETH.sub(_amount);
+    //     emit DefaultPoolETHBalanceUpdated(ETH);
+    //     emit EtherSent(activePool, _amount);
+
+    //     (bool success, ) = activePool.call{ value: _amount }("");
+    //     require(success, "DefaultPool: sending ETH failed");
+    // }
 
     function increaseLUSDDebt(uint _amount) external override {
         _requireCallerIsTroveManager();

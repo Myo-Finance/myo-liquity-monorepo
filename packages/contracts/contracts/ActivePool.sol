@@ -7,6 +7,7 @@ import "./Dependencies/SafeMath.sol";
 import "./Dependencies/Ownable.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
+import "./Dependencies/ERC20Pool.sol";
 
 /*
  * The Active Pool holds the ETH collateral and LUSD debt (but not LUSD tokens) for all active troves.
@@ -15,7 +16,7 @@ import "./Dependencies/console.sol";
  * Stability Pool, the Default Pool, or both, depending on the liquidation conditions.
  *
  */
-contract ActivePool is Ownable, CheckContract, IActivePool {
+contract ActivePool is Ownable, CheckContract, ERC20Pool, IActivePool {
     using SafeMath for uint256;
 
     string constant public NAME = "ActivePool";
@@ -32,7 +33,8 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
     event ActivePoolLUSDDebtUpdated(uint _LUSDDebt);
-    event ActivePoolETHBalanceUpdated(uint _ETH);
+    // event ActivePoolETHBalanceUpdated(uint _ETH);
+    // event ActivePoolERC20BalanceUpdated(uint _amount);
 
     // --- Contract setters ---
 
@@ -70,9 +72,9 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
     *
     *Not necessarily equal to the the contract's raw ETH balance - ether can be forcibly sent to contracts.
     */
-    function getETH() external view override returns (uint) {
-        return ETH;
-    }
+    // function getETH() external view override returns (uint) {
+    //     return ETH;
+    // }
 
     function getLUSDDebt() external view override returns (uint) {
         return LUSDDebt;
@@ -80,15 +82,36 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
 
     // --- Pool functionality ---
 
-    function sendETH(address _account, uint _amount) external override {
+    function sendERC20(address _receiver, uint _amount) external override { 
         _requireCallerIsBOorTroveMorSP();
-        ETH = ETH.sub(_amount);
-        emit ActivePoolETHBalanceUpdated(ETH);
-        emit EtherSent(_account, _amount);
 
-        (bool success, ) = _account.call{ value: _amount }("");
-        require(success, "ActivePool: sending ETH failed");
+        uint newBalance = IERC20(erc20TokenAddress).balanceOf(address(this)).sub(_amount);
+        emit ActivePoolERC20BalanceUpdated(newBalance);
+        emit ERC20Sent(_receiver, _amount);
+
+        bool success = IERC20(erc20TokenAddress).transfer(_receiver, _amount);
+        require(success, "ActivePool: sending ERC20 failed");
     }
+
+    function receiveERC20(address _sender, uint _amount) 
+        external
+    {
+        _requireCallerIsBorrowerOperationsOrDefaultPool();
+        emit ActivePoolERC20BalanceUpdated(_amount);
+
+        bool success = IERC20(erc20TokenAddress).transferFrom(_sender, address(this), _amount);
+        require(success, "ActivePool: receiving ERC20 failed");
+    }
+
+    // function sendETH(address _account, uint _amount) external override {
+    //     _requireCallerIsBOorTroveMorSP();
+    //     ETH = ETH.sub(_amount);
+    //     emit ActivePoolETHBalanceUpdated(ETH);
+    //     emit EtherSent(_account, _amount);
+
+    //     (bool success, ) = _account.call{ value: _amount }("");
+    //     require(success, "ActivePool: sending ETH failed");
+    // }
 
     function increaseLUSDDebt(uint _amount) external override {
         _requireCallerIsBOorTroveM();
@@ -128,9 +151,9 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
 
     // --- Fallback function ---
 
-    receive() external payable {
-        _requireCallerIsBorrowerOperationsOrDefaultPool();
-        ETH = ETH.add(msg.value);
-        emit ActivePoolETHBalanceUpdated(ETH);
-    }
+    // receive() external payable {
+    //     _requireCallerIsBorrowerOperationsOrDefaultPool();
+    //     ETH = ETH.add(msg.value);
+    //     emit ActivePoolETHBalanceUpdated(ETH);
+    // }
 }
