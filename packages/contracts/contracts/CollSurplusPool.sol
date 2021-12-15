@@ -7,6 +7,7 @@ import "./Dependencies/SafeMath.sol";
 import "./Dependencies/Ownable.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
+import "./Dependencies/IERC20.sol";
 
 
 contract CollSurplusPool is Ownable, CheckContract, ICollSurplusPool {
@@ -17,6 +18,8 @@ contract CollSurplusPool is Ownable, CheckContract, ICollSurplusPool {
     address public borrowerOperationsAddress;
     address public troveManagerAddress;
     address public activePoolAddress;
+
+    address public erc20TokenAddress;
 
     // deposited ether tracker
     uint256 internal ETH;
@@ -58,10 +61,23 @@ contract CollSurplusPool is Ownable, CheckContract, ICollSurplusPool {
         _renounceOwnership();
     }
 
-    /* Returns the ETH state variable at ActivePool address.
+    function setERC20Address(address _erc20TokenAddress)
+        external
+        override
+        onlyOwner
+    {
+        erc20TokenAddress = _erc20TokenAddress;
+    }
+
+    /* Returns the ERC20 state variable at ActivePool address.
        Not necessarily equal to the raw ether balance - ether can be forcibly sent to contracts. */
-    function getETH() external view override returns (uint) {
-        return ETH;
+    // function getETH() external view override returns (uint) {
+    //     return ETH;
+    // }
+
+    /* Returns the ERC20 balance at ActivePool address. */
+    function getERC20Balance() external view override returns (uint) {
+        IERC20(erc20TokenAddress).balanceOf(activePoolAddress);
     }
 
     function getCollateral(address _account) external view override returns (uint) {
@@ -116,8 +132,8 @@ contract CollSurplusPool is Ownable, CheckContract, ICollSurplusPool {
 
     // --- Fallback function ---
 
-    receive() external payable {
-        _requireCallerIsActivePool();
-        ETH = ETH.add(msg.value);
-    }
+    // receive() external payable {
+    //     _requireCallerIsActivePool();
+    //     ETH = ETH.add(msg.value);
+    // }
 }

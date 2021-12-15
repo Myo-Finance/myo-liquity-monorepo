@@ -361,11 +361,11 @@ contract EchidnaTester {
             return false;
         }
 
-        if (address(activePool).balance != activePool.getETH()) {
+        if (address(activePool).balance != activePool.getERC20TokenBalance()) {
             return false;
         }
 
-        if (address(defaultPool).balance != defaultPool.getETH()) {
+        if (address(defaultPool).balance != defaultPool.getERC20TokenBalance()) {
             return false;
         }
 

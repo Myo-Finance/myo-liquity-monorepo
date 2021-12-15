@@ -12,7 +12,8 @@ interface ICollSurplusPool {
     event ActivePoolAddressChanged(address _newActivePoolAddress);
 
     event CollBalanceUpdated(address indexed _account, uint _newBalance);
-    event EtherSent(address _to, uint _amount);
+    // event EtherSent(address _to, uint _amount);
+    event ERC20Sent(address _to, uint _amount);
 
     // --- Contract setters ---
 
@@ -22,7 +23,10 @@ interface ICollSurplusPool {
         address _activePoolAddress
     ) external;
 
-    function getETH() external view returns (uint);
+    function setERC20Address(address _erc20TokenAddress) external; 
+
+    // function getETH() external view returns (uint);
+    function getERC20Balance() external view returns (uint);
 
     function getCollateral(address _account) external view returns (uint);
 
