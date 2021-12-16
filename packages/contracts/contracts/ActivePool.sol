@@ -25,7 +25,7 @@ contract ActivePool is Ownable, CheckContract, ERC20Pool, IActivePool {
     address public troveManagerAddress;
     address public stabilityPoolAddress;
     address public defaultPoolAddress;
-    uint256 internal ETH;  // deposited ether tracker
+    // uint256 internal ETH;  // deposited ether tracker
     uint256 internal LUSDDebt;
 
     // --- Events ---

@@ -103,10 +103,11 @@ contract CollSurplusPool is Ownable, CheckContract, ICollSurplusPool {
         balances[_account] = 0;
         emit CollBalanceUpdated(_account, 0);
 
-        ETH = ETH.sub(claimableColl);
-        emit EtherSent(_account, claimableColl);
+        // ETH = ETH.sub(claimableColl);
+        emit ERC20Sent(_account, claimableColl);
 
-        (bool success, ) = _account.call{ value: claimableColl }("");
+        bool success = IERC20(erc20TokenAddress).transfer(_account, claimableColl);
+        // (bool success, ) = _account.call{ value: claimableColl }("");
         require(success, "CollSurplusPool: sending ETH failed");
     }
 
