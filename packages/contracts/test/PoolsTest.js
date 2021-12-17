@@ -4,6 +4,7 @@ const DefaultPool = artifacts.require("./DefaultPool.sol")
 const NonPayable = artifacts.require("./NonPayable.sol")
 const MockDAI = artifacts.require("./ERC20Mock.sol")
 
+const { BigNumber } = require("ethers")
 const testHelpers = require("../utils/testHelpers.js")
 
 const th = testHelpers.TestHelper
@@ -45,7 +46,12 @@ contract('ActivePool', async accounts => {
   beforeEach(async () => {
     activePool = await ActivePool.new()
     mockBorrowerOperations = await NonPayable.new()
-    mockDai = await MockDAI.new()
+    mockDai = await MockDAI.new(
+      "PAI Stablecoin",
+      "PAI",
+      owner,
+      BigNumber.from("1000")
+    )
     const dumbContractAddress = (await NonPayable.new()).address
     await activePool.setAddresses(mockBorrowerOperations.address, dumbContractAddress, dumbContractAddress, dumbContractAddress)
     await activePool.setERC20TokenAddress(mockDai.address)
