@@ -38,28 +38,6 @@ contract ERC20Pool is IERC20Pool, Ownable {
     }
 
 
-
-    // Join and Exit Pool
-
-    function join(address _from, uint _amount)
-        override
-        external
-    {
-        IERC20 token = IERC20(erc20TokenAddress);
-
-        bool success = token.transferFrom(_from, address(this), _amount);
-        require(success, "ERC20Pool: Join failed");
-    }
-
-    function exit(address _to, uint _amount)
-        override
-        external
-    {
-        IERC20 token = IERC20(erc20TokenAddress);
-
-        
-    }
-
     function _setERC20TokenAddress(address _newTokenAddress) internal {
         erc20TokenAddress = _newTokenAddress;
         emit ERC20TokenAddressChanged(_newTokenAddress);

@@ -465,9 +465,9 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     //     require(success, "BorrowerOps: Sending ETH to ActivePool failed");
     // }
 
+    // ActivePool.receiveERC20(address, uint) will revert if not succesful. 
     function _activePoolAddColl(address _sender, IActivePool _activePool, uint _amount) internal {
-        bool success = IERC20(erc20TokenAddress).transferFrom(_sender, address(_activePool), _amount);
-        require(success, "BorrowerOps: Sending ERC20 collateral to ActivePool failed");
+        _activePool.receiveERC20(_sender, _amount);
     }
 
     // Issue the specified amount of LUSD to _account and increases the total active debt (_netDebtIncrease potentially includes a LUSDFee)

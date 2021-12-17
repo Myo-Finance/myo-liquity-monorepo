@@ -25,7 +25,7 @@ contract ActivePool is Ownable, CheckContract, ERC20Pool, IActivePool {
     address public troveManagerAddress;
     address public stabilityPoolAddress;
     address public defaultPoolAddress;
-    // uint256 internal ETH;  // deposited ether tracker
+    uint256 internal ERC20Coll;  // deposited ether tracker
     uint256 internal LUSDDebt;
 
     // --- Events ---
@@ -68,13 +68,11 @@ contract ActivePool is Ownable, CheckContract, ERC20Pool, IActivePool {
     // --- Getters for public variables. Required by IPool interface ---
 
     /*
-    * Returns the ETH state variable.
-    *
-    *Not necessarily equal to the the contract's raw ETH balance - ether can be forcibly sent to contracts.
-    */
-    // function getETH() external view override returns (uint) {
-    //     return ETH;
-    // }
+    * Returns the ERC20Coll state variable.
+    * Not necessarily equal to the the contract's raw ERC20 balance - it can be forcibly sent to contracts. */
+    function getERC20Coll() external view override returns (uint) {
+        return ERC20Coll;
+    }
 
     function getLUSDDebt() external view override returns (uint) {
         return LUSDDebt;
@@ -82,26 +80,34 @@ contract ActivePool is Ownable, CheckContract, ERC20Pool, IActivePool {
 
     // --- Pool functionality ---
 
-    function sendERC20(address _receiver, uint _amount) external override { 
-        _requireCallerIsBOorTroveMorSP();
+    function receiveERC20(address _sender, uint _amount) 
+        external
+        override
+    {
+        _requireCallerIsBorrowerOperationsOrDefaultPool();
 
-        uint newBalance = IERC20(erc20TokenAddress).balanceOf(address(this)).sub(_amount);
-        emit ActivePoolERC20BalanceUpdated(newBalance);
+        emit ActivePoolERC20BalanceUpdated(_amount);
+
+        ERC20Coll = ERC20Coll.add(_amount);
+        bool success = IERC20(erc20TokenAddress).transferFrom(_sender, address(this), _amount);
+        require(success, "ActivePool: receiving ERC20 failed");
+    }
+
+    function sendERC20(address _receiver, uint _amount) 
+        external 
+        override 
+    { 
+        _requireCallerIsBOorTroveMorSP();
+        require(ERC20Coll > 0, "ActivePool: No enough collateral");
+
+        ERC20Coll = ERC20Coll.sub(_amount);
+        emit ActivePoolERC20BalanceUpdated(ERC20Coll);
         emit ERC20Sent(_receiver, _amount);
 
         bool success = IERC20(erc20TokenAddress).transfer(_receiver, _amount);
         require(success, "ActivePool: sending ERC20 failed");
     }
 
-    function receiveERC20(address _sender, uint _amount) 
-        external
-    {
-        _requireCallerIsBorrowerOperationsOrDefaultPool();
-        emit ActivePoolERC20BalanceUpdated(_amount);
-
-        bool success = IERC20(erc20TokenAddress).transferFrom(_sender, address(this), _amount);
-        require(success, "ActivePool: receiving ERC20 failed");
-    }
 
     // function sendETH(address _account, uint _amount) external override {
     //     _requireCallerIsBOorTroveMorSP();
