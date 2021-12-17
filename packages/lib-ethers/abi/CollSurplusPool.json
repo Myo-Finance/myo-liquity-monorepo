@@ -60,6 +60,25 @@
         "type": "uint256"
       }
     ],
+    "name": "ERC20Sent",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_to",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
     "name": "EtherSent",
     "type": "event"
   },
@@ -166,6 +185,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "erc20TokenAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -186,7 +218,7 @@
   },
   {
     "inputs": [],
-    "name": "getETH",
+    "name": "getERC20Balance",
     "outputs": [
       {
         "internalType": "uint256",
@@ -247,6 +279,19 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_erc20TokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setERC20Address",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "troveManagerAddress",
     "outputs": [
@@ -258,9 +303,5 @@
     ],
     "stateMutability": "view",
     "type": "function"
-  },
-  {
-    "stateMutability": "payable",
-    "type": "receive"
   }
 ]

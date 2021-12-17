@@ -28,6 +28,8 @@ const BorrowerOperationsTester = artifacts.require("./BorrowerOperationsTester.s
 const TroveManagerTester = artifacts.require("./TroveManagerTester.sol")
 const LUSDTokenTester = artifacts.require("./LUSDTokenTester.sol")
 
+const MockDAI = artifacts.require('./ERC20Mock.sol"')
+
 // Proxy scripts
 const BorrowerOperationsScript = artifacts.require('BorrowerOperationsScript')
 const BorrowerWrappersScript = artifacts.require('BorrowerWrappersScript')
@@ -35,6 +37,7 @@ const TroveManagerScript = artifacts.require('TroveManagerScript')
 const StabilityPoolScript = artifacts.require('StabilityPoolScript')
 const TokenScript = artifacts.require('TokenScript')
 const LQTYStakingScript = artifacts.require('LQTYStakingScript')
+const { artifacts } = require('hardhat');
 const {
   buildUserProxies,
   BorrowerOperationsProxy,
@@ -155,6 +158,9 @@ class DeploymentHelper {
       testerContracts.stabilityPool.address,
       testerContracts.borrowerOperations.address
     )
+
+    testerContracts.mockDAI = MockDAI.new();
+
     return testerContracts
   }
 
@@ -367,6 +373,10 @@ class DeploymentHelper {
       LQTYContracts.lqtyStaking.address
     )
 
+    await contracts.borrowerOperations.setERC20Address(
+      contracts.mockDAI.address
+    )
+
     // set contracts in the Pools
     await contracts.stabilityPool.setAddresses(
       contracts.borrowerOperations.address,
@@ -385,15 +395,27 @@ class DeploymentHelper {
       contracts.defaultPool.address
     )
 
+    contracts.activePool.setERC20TokenAddress(
+      contracts.mockDAI.address
+    )
+
     await contracts.defaultPool.setAddresses(
       contracts.troveManager.address,
       contracts.activePool.address,
+    )
+
+    contracts.defaultPool.setERC20TokenAddress(
+      contracts.mockDAI.address
     )
 
     await contracts.collSurplusPool.setAddresses(
       contracts.borrowerOperations.address,
       contracts.troveManager.address,
       contracts.activePool.address,
+    )
+
+    contracts.collSurplusPool.setERC20Address(
+      contracts.mockDAI.address
     )
 
     // set contracts in HintHelpers
@@ -427,25 +449,25 @@ class DeploymentHelper {
     await uniPool.setParams(LQTYContracts.lqtyToken.address, uniswapPairAddr, duration)
   }
 
-  static async connectERC20Collateral(erc20CollateralAddress) {
+  // static async connectERC20Collateral(erc20CollateralAddress) {
 
-    ActivePool
-    BorrowerOperations
-    CollSurplusPool
-    DefaultPool
-    StabilityPool
-    LQTYStaking
-    BorrowerOperationsScript
-    BorrowerWrappersScript
-    ActivePoolTester
-    BorrowerOperationsTester
-    DefaultPoolTester
-    Destructible
-    EchidnaProxy
-    EchidnaTester
-    StabilityPoolTester
+  //   ActivePool
+  //   BorrowerOperations
+  //   CollSurplusPool
+  //   DefaultPool
+  //   StabilityPool
+  //   LQTYStaking
+  //   BorrowerOperationsScript
+  //   BorrowerWrappersScript
+  //   ActivePoolTester
+  //   BorrowerOperationsTester
+  //   DefaultPoolTester
+  //   Destructible
+  //   EchidnaProxy
+  //   EchidnaTester
+  //   StabilityPoolTester
     
 
-  }
+  // }
 }
 module.exports = DeploymentHelper

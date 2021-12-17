@@ -48,16 +48,17 @@ contract BorrowerOperationsTester is BorrowerOperations {
     (
         address _borrower, 
         uint _collWithdrawal, 
+        uint _collDeposit,
         uint _debtChange, 
         bool _isDebtIncrease, 
         address _upperHint,
         address _lowerHint)
         external 
     {
-        _adjustTrove(_borrower, _collWithdrawal, _debtChange, _isDebtIncrease, _upperHint, _lowerHint, 0);
+        _adjustTrove(_borrower, _collWithdrawal, _collDeposit, _debtChange, _isDebtIncrease, _upperHint, _lowerHint, 0);
     }
 
 
     // Payable fallback function
-    receive() external payable { }
+    // receive() external payable { }
 }

@@ -31,6 +31,19 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "DefaultPoolERC20BalanceUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "_ETH",
         "type": "uint256"
       }
@@ -61,7 +74,7 @@
         "type": "uint256"
       }
     ],
-    "name": "ETHBalanceUpdated",
+    "name": "ERC20BalanceUpdated",
     "type": "event"
   },
   {
@@ -80,7 +93,20 @@
         "type": "uint256"
       }
     ],
-    "name": "EtherSent",
+    "name": "ERC20Sent",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_newERC20TokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "ERC20TokenAddressChanged",
     "type": "event"
   },
   {
@@ -182,7 +208,33 @@
   },
   {
     "inputs": [],
-    "name": "getETH",
+    "name": "erc20TokenAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getERC20TokenAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getERC20TokenBalance",
     "outputs": [
       {
         "internalType": "uint256",
@@ -253,7 +305,7 @@
         "type": "uint256"
       }
     ],
-    "name": "sendETHToActivePool",
+    "name": "sendERC20ToActivePool",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -272,6 +324,19 @@
       }
     ],
     "name": "setAddresses",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_newTokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setERC20TokenAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

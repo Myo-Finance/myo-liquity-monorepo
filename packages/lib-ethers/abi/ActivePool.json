@@ -18,11 +18,11 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_ETH",
+        "name": "_amount",
         "type": "uint256"
       }
     ],
-    "name": "ActivePoolETHBalanceUpdated",
+    "name": "ActivePoolERC20BalanceUpdated",
     "type": "event"
   },
   {
@@ -74,7 +74,7 @@
         "type": "uint256"
       }
     ],
-    "name": "ETHBalanceUpdated",
+    "name": "ERC20BalanceUpdated",
     "type": "event"
   },
   {
@@ -93,7 +93,20 @@
         "type": "uint256"
       }
     ],
-    "name": "EtherSent",
+    "name": "ERC20Sent",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_newERC20TokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "ERC20TokenAddressChanged",
     "type": "event"
   },
   {
@@ -208,7 +221,33 @@
   },
   {
     "inputs": [],
-    "name": "getETH",
+    "name": "erc20TokenAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getERC20TokenAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getERC20TokenBalance",
     "outputs": [
       {
         "internalType": "uint256",
@@ -275,7 +314,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_account",
+        "name": "_sender",
         "type": "address"
       },
       {
@@ -284,7 +323,25 @@
         "type": "uint256"
       }
     ],
-    "name": "sendETH",
+    "name": "receiveERC20",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "sendERC20",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -318,6 +375,19 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_newTokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setERC20TokenAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "stabilityPoolAddress",
     "outputs": [
@@ -342,9 +412,5 @@
     ],
     "stateMutability": "view",
     "type": "function"
-  },
-  {
-    "stateMutability": "payable",
-    "type": "receive"
   }
 ]

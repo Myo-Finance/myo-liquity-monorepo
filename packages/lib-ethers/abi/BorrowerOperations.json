@@ -356,6 +356,11 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "_ERC20Amount",
+        "type": "uint256"
+      },
+      {
         "internalType": "address",
         "name": "_upperHint",
         "type": "address"
@@ -368,7 +373,7 @@
     ],
     "name": "addColl",
     "outputs": [],
-    "stateMutability": "payable",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -381,6 +386,11 @@
       {
         "internalType": "uint256",
         "name": "_collWithdrawal",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_collDeposit",
         "type": "uint256"
       },
       {
@@ -406,7 +416,7 @@
     ],
     "name": "adjustTrove",
     "outputs": [],
-    "stateMutability": "payable",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -429,6 +439,19 @@
     "outputs": [
       {
         "internalType": "contract IDefaultPool",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "erc20TokenAddress",
+    "outputs": [
+      {
+        "internalType": "address",
         "name": "",
         "type": "address"
       }
@@ -536,6 +559,11 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "_ERC20Amount",
+        "type": "uint256"
+      },
+      {
         "internalType": "address",
         "name": "_borrower",
         "type": "address"
@@ -551,9 +579,9 @@
         "type": "address"
       }
     ],
-    "name": "moveETHGainToTrove",
+    "name": "moveERC20GainToTrove",
     "outputs": [],
-    "stateMutability": "payable",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -569,6 +597,11 @@
         "type": "uint256"
       },
       {
+        "internalType": "uint256",
+        "name": "_ERC20Amount",
+        "type": "uint256"
+      },
+      {
         "internalType": "address",
         "name": "_upperHint",
         "type": "address"
@@ -581,7 +614,7 @@
     ],
     "name": "openTrove",
     "outputs": [],
-    "stateMutability": "payable",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -687,6 +720,19 @@
       }
     ],
     "name": "setAddresses",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_erc20TokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setERC20Address",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

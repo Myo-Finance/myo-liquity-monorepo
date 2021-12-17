@@ -15,7 +15,9 @@ interface ActivePoolCalls {
   NAME(_overrides?: CallOverrides): Promise<string>;
   borrowerOperationsAddress(_overrides?: CallOverrides): Promise<string>;
   defaultPoolAddress(_overrides?: CallOverrides): Promise<string>;
-  getETH(_overrides?: CallOverrides): Promise<BigNumber>;
+  erc20TokenAddress(_overrides?: CallOverrides): Promise<string>;
+  getERC20TokenAddress(_overrides?: CallOverrides): Promise<string>;
+  getERC20TokenBalance(_overrides?: CallOverrides): Promise<BigNumber>;
   getLUSDDebt(_overrides?: CallOverrides): Promise<BigNumber>;
   isOwner(_overrides?: CallOverrides): Promise<boolean>;
   owner(_overrides?: CallOverrides): Promise<string>;
@@ -26,32 +28,36 @@ interface ActivePoolCalls {
 interface ActivePoolTransactions {
   decreaseLUSDDebt(_amount: BigNumberish, _overrides?: Overrides): Promise<void>;
   increaseLUSDDebt(_amount: BigNumberish, _overrides?: Overrides): Promise<void>;
-  sendETH(_account: string, _amount: BigNumberish, _overrides?: Overrides): Promise<void>;
+  receiveERC20(_sender: string, _amount: BigNumberish, _overrides?: Overrides): Promise<void>;
+  sendERC20(_receiver: string, _amount: BigNumberish, _overrides?: Overrides): Promise<void>;
   setAddresses(_borrowerOperationsAddress: string, _troveManagerAddress: string, _stabilityPoolAddress: string, _defaultPoolAddress: string, _overrides?: Overrides): Promise<void>;
+  setERC20TokenAddress(_newTokenAddress: string, _overrides?: Overrides): Promise<void>;
 }
 
 export interface ActivePool
   extends _TypedLiquityContract<ActivePoolCalls, ActivePoolTransactions> {
   readonly filters: {
     ActivePoolAddressChanged(_newActivePoolAddress?: null): EventFilter;
-    ActivePoolETHBalanceUpdated(_ETH?: null): EventFilter;
+    ActivePoolERC20BalanceUpdated(_amount?: null): EventFilter;
     ActivePoolLUSDDebtUpdated(_LUSDDebt?: null): EventFilter;
     BorrowerOperationsAddressChanged(_newBorrowerOperationsAddress?: null): EventFilter;
     DefaultPoolAddressChanged(_newDefaultPoolAddress?: null): EventFilter;
-    ETHBalanceUpdated(_newBalance?: null): EventFilter;
-    EtherSent(_to?: null, _amount?: null): EventFilter;
+    ERC20BalanceUpdated(_newBalance?: null): EventFilter;
+    ERC20Sent(_to?: null, _amount?: null): EventFilter;
+    ERC20TokenAddressChanged(_newERC20TokenAddress?: null): EventFilter;
     LUSDBalanceUpdated(_newBalance?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
     StabilityPoolAddressChanged(_newStabilityPoolAddress?: null): EventFilter;
     TroveManagerAddressChanged(_newTroveManagerAddress?: null): EventFilter;
   };
   extractEvents(logs: Log[], name: "ActivePoolAddressChanged"): _TypedLogDescription<{ _newActivePoolAddress: string }>[];
-  extractEvents(logs: Log[], name: "ActivePoolETHBalanceUpdated"): _TypedLogDescription<{ _ETH: BigNumber }>[];
+  extractEvents(logs: Log[], name: "ActivePoolERC20BalanceUpdated"): _TypedLogDescription<{ _amount: BigNumber }>[];
   extractEvents(logs: Log[], name: "ActivePoolLUSDDebtUpdated"): _TypedLogDescription<{ _LUSDDebt: BigNumber }>[];
   extractEvents(logs: Log[], name: "BorrowerOperationsAddressChanged"): _TypedLogDescription<{ _newBorrowerOperationsAddress: string }>[];
   extractEvents(logs: Log[], name: "DefaultPoolAddressChanged"): _TypedLogDescription<{ _newDefaultPoolAddress: string }>[];
-  extractEvents(logs: Log[], name: "ETHBalanceUpdated"): _TypedLogDescription<{ _newBalance: BigNumber }>[];
-  extractEvents(logs: Log[], name: "EtherSent"): _TypedLogDescription<{ _to: string; _amount: BigNumber }>[];
+  extractEvents(logs: Log[], name: "ERC20BalanceUpdated"): _TypedLogDescription<{ _newBalance: BigNumber }>[];
+  extractEvents(logs: Log[], name: "ERC20Sent"): _TypedLogDescription<{ _to: string; _amount: BigNumber }>[];
+  extractEvents(logs: Log[], name: "ERC20TokenAddressChanged"): _TypedLogDescription<{ _newERC20TokenAddress: string }>[];
   extractEvents(logs: Log[], name: "LUSDBalanceUpdated"): _TypedLogDescription<{ _newBalance: BigNumber }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
   extractEvents(logs: Log[], name: "StabilityPoolAddressChanged"): _TypedLogDescription<{ _newStabilityPoolAddress: string }>[];
@@ -70,6 +76,7 @@ interface BorrowerOperationsCalls {
   _100pct(_overrides?: CallOverrides): Promise<BigNumber>;
   activePool(_overrides?: CallOverrides): Promise<string>;
   defaultPool(_overrides?: CallOverrides): Promise<string>;
+  erc20TokenAddress(_overrides?: CallOverrides): Promise<string>;
   getCompositeDebt(_debt: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
   getEntireSystemColl(_overrides?: CallOverrides): Promise<BigNumber>;
   getEntireSystemDebt(_overrides?: CallOverrides): Promise<BigNumber>;
@@ -84,14 +91,15 @@ interface BorrowerOperationsCalls {
 }
 
 interface BorrowerOperationsTransactions {
-  addColl(_upperHint: string, _lowerHint: string, _overrides?: PayableOverrides): Promise<void>;
-  adjustTrove(_maxFeePercentage: BigNumberish, _collWithdrawal: BigNumberish, _LUSDChange: BigNumberish, _isDebtIncrease: boolean, _upperHint: string, _lowerHint: string, _overrides?: PayableOverrides): Promise<void>;
+  addColl(_ERC20Amount: BigNumberish, _upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<void>;
+  adjustTrove(_maxFeePercentage: BigNumberish, _collWithdrawal: BigNumberish, _collDeposit: BigNumberish, _LUSDChange: BigNumberish, _isDebtIncrease: boolean, _upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<void>;
   claimCollateral(_overrides?: Overrides): Promise<void>;
   closeTrove(_overrides?: Overrides): Promise<void>;
-  moveETHGainToTrove(_borrower: string, _upperHint: string, _lowerHint: string, _overrides?: PayableOverrides): Promise<void>;
-  openTrove(_maxFeePercentage: BigNumberish, _LUSDAmount: BigNumberish, _upperHint: string, _lowerHint: string, _overrides?: PayableOverrides): Promise<void>;
+  moveERC20GainToTrove(_ERC20Amount: BigNumberish, _borrower: string, _upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<void>;
+  openTrove(_maxFeePercentage: BigNumberish, _LUSDAmount: BigNumberish, _ERC20Amount: BigNumberish, _upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<void>;
   repayLUSD(_LUSDAmount: BigNumberish, _upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<void>;
   setAddresses(_troveManagerAddress: string, _activePoolAddress: string, _defaultPoolAddress: string, _stabilityPoolAddress: string, _gasPoolAddress: string, _collSurplusPoolAddress: string, _priceFeedAddress: string, _sortedTrovesAddress: string, _lusdTokenAddress: string, _lqtyStakingAddress: string, _overrides?: Overrides): Promise<void>;
+  setERC20Address(_erc20TokenAddress: string, _overrides?: Overrides): Promise<void>;
   withdrawColl(_collWithdrawal: BigNumberish, _upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<void>;
   withdrawLUSD(_maxFeePercentage: BigNumberish, _LUSDAmount: BigNumberish, _upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<void>;
 }
@@ -134,8 +142,9 @@ interface CollSurplusPoolCalls {
   NAME(_overrides?: CallOverrides): Promise<string>;
   activePoolAddress(_overrides?: CallOverrides): Promise<string>;
   borrowerOperationsAddress(_overrides?: CallOverrides): Promise<string>;
+  erc20TokenAddress(_overrides?: CallOverrides): Promise<string>;
   getCollateral(_account: string, _overrides?: CallOverrides): Promise<BigNumber>;
-  getETH(_overrides?: CallOverrides): Promise<BigNumber>;
+  getERC20Balance(_overrides?: CallOverrides): Promise<BigNumber>;
   isOwner(_overrides?: CallOverrides): Promise<boolean>;
   owner(_overrides?: CallOverrides): Promise<string>;
   troveManagerAddress(_overrides?: CallOverrides): Promise<string>;
@@ -145,6 +154,7 @@ interface CollSurplusPoolTransactions {
   accountSurplus(_account: string, _amount: BigNumberish, _overrides?: Overrides): Promise<void>;
   claimColl(_account: string, _overrides?: Overrides): Promise<void>;
   setAddresses(_borrowerOperationsAddress: string, _troveManagerAddress: string, _activePoolAddress: string, _overrides?: Overrides): Promise<void>;
+  setERC20Address(_erc20TokenAddress: string, _overrides?: Overrides): Promise<void>;
 }
 
 export interface CollSurplusPool
@@ -153,6 +163,7 @@ export interface CollSurplusPool
     ActivePoolAddressChanged(_newActivePoolAddress?: null): EventFilter;
     BorrowerOperationsAddressChanged(_newBorrowerOperationsAddress?: null): EventFilter;
     CollBalanceUpdated(_account?: string | null, _newBalance?: null): EventFilter;
+    ERC20Sent(_to?: null, _amount?: null): EventFilter;
     EtherSent(_to?: null, _amount?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
     TroveManagerAddressChanged(_newTroveManagerAddress?: null): EventFilter;
@@ -160,6 +171,7 @@ export interface CollSurplusPool
   extractEvents(logs: Log[], name: "ActivePoolAddressChanged"): _TypedLogDescription<{ _newActivePoolAddress: string }>[];
   extractEvents(logs: Log[], name: "BorrowerOperationsAddressChanged"): _TypedLogDescription<{ _newBorrowerOperationsAddress: string }>[];
   extractEvents(logs: Log[], name: "CollBalanceUpdated"): _TypedLogDescription<{ _account: string; _newBalance: BigNumber }>[];
+  extractEvents(logs: Log[], name: "ERC20Sent"): _TypedLogDescription<{ _to: string; _amount: BigNumber }>[];
   extractEvents(logs: Log[], name: "EtherSent"): _TypedLogDescription<{ _to: string; _amount: BigNumber }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
   extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _newTroveManagerAddress: string }>[];
@@ -202,7 +214,9 @@ export interface CommunityIssuance
 interface DefaultPoolCalls {
   NAME(_overrides?: CallOverrides): Promise<string>;
   activePoolAddress(_overrides?: CallOverrides): Promise<string>;
-  getETH(_overrides?: CallOverrides): Promise<BigNumber>;
+  erc20TokenAddress(_overrides?: CallOverrides): Promise<string>;
+  getERC20TokenAddress(_overrides?: CallOverrides): Promise<string>;
+  getERC20TokenBalance(_overrides?: CallOverrides): Promise<BigNumber>;
   getLUSDDebt(_overrides?: CallOverrides): Promise<BigNumber>;
   isOwner(_overrides?: CallOverrides): Promise<boolean>;
   owner(_overrides?: CallOverrides): Promise<string>;
@@ -212,8 +226,9 @@ interface DefaultPoolCalls {
 interface DefaultPoolTransactions {
   decreaseLUSDDebt(_amount: BigNumberish, _overrides?: Overrides): Promise<void>;
   increaseLUSDDebt(_amount: BigNumberish, _overrides?: Overrides): Promise<void>;
-  sendETHToActivePool(_amount: BigNumberish, _overrides?: Overrides): Promise<void>;
+  sendERC20ToActivePool(_amount: BigNumberish, _overrides?: Overrides): Promise<void>;
   setAddresses(_troveManagerAddress: string, _activePoolAddress: string, _overrides?: Overrides): Promise<void>;
+  setERC20TokenAddress(_newTokenAddress: string, _overrides?: Overrides): Promise<void>;
 }
 
 export interface DefaultPool
@@ -221,10 +236,12 @@ export interface DefaultPool
   readonly filters: {
     ActivePoolAddressChanged(_newActivePoolAddress?: null): EventFilter;
     DefaultPoolAddressChanged(_newDefaultPoolAddress?: null): EventFilter;
+    DefaultPoolERC20BalanceUpdated(_amount?: null): EventFilter;
     DefaultPoolETHBalanceUpdated(_ETH?: null): EventFilter;
     DefaultPoolLUSDDebtUpdated(_LUSDDebt?: null): EventFilter;
-    ETHBalanceUpdated(_newBalance?: null): EventFilter;
-    EtherSent(_to?: null, _amount?: null): EventFilter;
+    ERC20BalanceUpdated(_newBalance?: null): EventFilter;
+    ERC20Sent(_to?: null, _amount?: null): EventFilter;
+    ERC20TokenAddressChanged(_newERC20TokenAddress?: null): EventFilter;
     LUSDBalanceUpdated(_newBalance?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
     StabilityPoolAddressChanged(_newStabilityPoolAddress?: null): EventFilter;
@@ -232,10 +249,12 @@ export interface DefaultPool
   };
   extractEvents(logs: Log[], name: "ActivePoolAddressChanged"): _TypedLogDescription<{ _newActivePoolAddress: string }>[];
   extractEvents(logs: Log[], name: "DefaultPoolAddressChanged"): _TypedLogDescription<{ _newDefaultPoolAddress: string }>[];
+  extractEvents(logs: Log[], name: "DefaultPoolERC20BalanceUpdated"): _TypedLogDescription<{ _amount: BigNumber }>[];
   extractEvents(logs: Log[], name: "DefaultPoolETHBalanceUpdated"): _TypedLogDescription<{ _ETH: BigNumber }>[];
   extractEvents(logs: Log[], name: "DefaultPoolLUSDDebtUpdated"): _TypedLogDescription<{ _LUSDDebt: BigNumber }>[];
-  extractEvents(logs: Log[], name: "ETHBalanceUpdated"): _TypedLogDescription<{ _newBalance: BigNumber }>[];
-  extractEvents(logs: Log[], name: "EtherSent"): _TypedLogDescription<{ _to: string; _amount: BigNumber }>[];
+  extractEvents(logs: Log[], name: "ERC20BalanceUpdated"): _TypedLogDescription<{ _newBalance: BigNumber }>[];
+  extractEvents(logs: Log[], name: "ERC20Sent"): _TypedLogDescription<{ _to: string; _amount: BigNumber }>[];
+  extractEvents(logs: Log[], name: "ERC20TokenAddressChanged"): _TypedLogDescription<{ _newERC20TokenAddress: string }>[];
   extractEvents(logs: Log[], name: "LUSDBalanceUpdated"): _TypedLogDescription<{ _newBalance: BigNumber }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
   extractEvents(logs: Log[], name: "StabilityPoolAddressChanged"): _TypedLogDescription<{ _newStabilityPoolAddress: string }>[];
@@ -851,7 +870,7 @@ export interface TroveManager
     Liquidation(_liquidatedDebt?: null, _liquidatedColl?: null, _collGasCompensation?: null, _LUSDGasCompensation?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
     PriceFeedAddressChanged(_newPriceFeedAddress?: null): EventFilter;
-    Redemption(_attemptedLUSDAmount?: null, _actualLUSDAmount?: null, _ETHSent?: null, _ETHFee?: null): EventFilter;
+    Redemption(_attemptedLUSDAmount?: null, _actualLUSDAmount?: null, _ETHSent?: null, _COLFee?: null): EventFilter;
     SortedTrovesAddressChanged(_sortedTrovesAddress?: null): EventFilter;
     StabilityPoolAddressChanged(_stabilityPoolAddress?: null): EventFilter;
     SystemSnapshotsUpdated(_totalStakesSnapshot?: null, _totalCollateralSnapshot?: null): EventFilter;
@@ -875,7 +894,7 @@ export interface TroveManager
   extractEvents(logs: Log[], name: "Liquidation"): _TypedLogDescription<{ _liquidatedDebt: BigNumber; _liquidatedColl: BigNumber; _collGasCompensation: BigNumber; _LUSDGasCompensation: BigNumber }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
   extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _newPriceFeedAddress: string }>[];
-  extractEvents(logs: Log[], name: "Redemption"): _TypedLogDescription<{ _attemptedLUSDAmount: BigNumber; _actualLUSDAmount: BigNumber; _ETHSent: BigNumber; _ETHFee: BigNumber }>[];
+  extractEvents(logs: Log[], name: "Redemption"): _TypedLogDescription<{ _attemptedLUSDAmount: BigNumber; _actualLUSDAmount: BigNumber; _ETHSent: BigNumber; _COLFee: BigNumber }>[];
   extractEvents(logs: Log[], name: "SortedTrovesAddressChanged"): _TypedLogDescription<{ _sortedTrovesAddress: string }>[];
   extractEvents(logs: Log[], name: "StabilityPoolAddressChanged"): _TypedLogDescription<{ _stabilityPoolAddress: string }>[];
   extractEvents(logs: Log[], name: "SystemSnapshotsUpdated"): _TypedLogDescription<{ _totalStakesSnapshot: BigNumber; _totalCollateralSnapshot: BigNumber }>[];
