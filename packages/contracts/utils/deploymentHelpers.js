@@ -37,7 +37,7 @@ const TroveManagerScript = artifacts.require('TroveManagerScript')
 const StabilityPoolScript = artifacts.require('StabilityPoolScript')
 const TokenScript = artifacts.require('TokenScript')
 const LQTYStakingScript = artifacts.require('LQTYStakingScript')
-const { artifacts } = require('hardhat');
+
 const {
   buildUserProxies,
   BorrowerOperationsProxy,

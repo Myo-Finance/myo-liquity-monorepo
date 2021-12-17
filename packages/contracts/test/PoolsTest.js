@@ -2,6 +2,7 @@ const StabilityPool = artifacts.require("./StabilityPool.sol")
 const ActivePool = artifacts.require("./ActivePool.sol")
 const DefaultPool = artifacts.require("./DefaultPool.sol")
 const NonPayable = artifacts.require("./NonPayable.sol")
+const MockDAI = artifacts.require("./ERC20Mock.sol")
 
 const testHelpers = require("../utils/testHelpers.js")
 
@@ -44,14 +45,21 @@ contract('ActivePool', async accounts => {
   beforeEach(async () => {
     activePool = await ActivePool.new()
     mockBorrowerOperations = await NonPayable.new()
+    mockDai = await MockDAI.new()
     const dumbContractAddress = (await NonPayable.new()).address
     await activePool.setAddresses(mockBorrowerOperations.address, dumbContractAddress, dumbContractAddress, dumbContractAddress)
+    await activePool.setERC20TokenAddress(mockDai.address)
   })
 
-  it('getETH(): gets the recorded ETH balance', async () => {
-    const recordedETHBalance = await activePool.getETH()
-    assert.equal(recordedETHBalance, 0)
+  it('erc20TokenAddress(): is not 0x0 address', async () => {
+    const erc20CollateralAddress = await activePool.erc20CollateralAddress();
+    assert.not.equal(erc20CollateralAddress, 0);
   })
+
+  // it('getETH(): gets the recorded ETH balance', async () => {
+  //   const recordedETHBalance = await activePool.getETH()
+  //   assert.equal(recordedETHBalance, 0)
+  // })
 
   it('getLUSDDebt(): gets the recorded LUSD balance', async () => {
     const recordedETHBalance = await activePool.getLUSDDebt()
@@ -89,34 +97,34 @@ contract('ActivePool', async accounts => {
   })
 
   // send raw ether
-  it('sendETH(): decreases the recorded ETH balance by the correct amount', async () => {
-    // setup: give pool 2 ether
-    const activePool_initialBalance = web3.utils.toBN(await web3.eth.getBalance(activePool.address))
-    assert.equal(activePool_initialBalance, 0)
-    // start pool with 2 ether
-    //await web3.eth.sendTransaction({ from: mockBorrowerOperationsAddress, to: activePool.address, value: dec(2, 'ether') })
-    const tx1 = await mockBorrowerOperations.forward(activePool.address, '0x', { from: owner, value: dec(2, 'ether') })
-    assert.isTrue(tx1.receipt.status)
+  // it('sendETH(): decreases the recorded ETH balance by the correct amount', async () => {
+  //   // setup: give pool 2 ether
+  //   const activePool_initialBalance = web3.utils.toBN(await web3.eth.getBalance(activePool.address))
+  //   assert.equal(activePool_initialBalance, 0)
+  //   // start pool with 2 ether
+  //   //await web3.eth.sendTransaction({ from: mockBorrowerOperationsAddress, to: activePool.address, value: dec(2, 'ether') })
+  //   const tx1 = await mockBorrowerOperations.forward(activePool.address, '0x', { from: owner, value: dec(2, 'ether') })
+  //   assert.isTrue(tx1.receipt.status)
 
-    const activePool_BalanceBeforeTx = web3.utils.toBN(await web3.eth.getBalance(activePool.address))
-    const alice_Balance_BeforeTx = web3.utils.toBN(await web3.eth.getBalance(alice))
+  //   const activePool_BalanceBeforeTx = web3.utils.toBN(await web3.eth.getBalance(activePool.address))
+  //   const alice_Balance_BeforeTx = web3.utils.toBN(await web3.eth.getBalance(alice))
 
-    assert.equal(activePool_BalanceBeforeTx, dec(2, 'ether'))
+  //   assert.equal(activePool_BalanceBeforeTx, dec(2, 'ether'))
 
-    // send ether from pool to alice
-    //await activePool.sendETH(alice, dec(1, 'ether'), { from: mockBorrowerOperationsAddress })
-    const sendETHData = th.getTransactionData('sendETH(address,uint256)', [alice, web3.utils.toHex(dec(1, 'ether'))])
-    const tx2 = await mockBorrowerOperations.forward(activePool.address, sendETHData, { from: owner })
-    assert.isTrue(tx2.receipt.status)
+  //   // send ether from pool to alice
+  //   //await activePool.sendETH(alice, dec(1, 'ether'), { from: mockBorrowerOperationsAddress })
+  //   const sendETHData = th.getTransactionData('sendETH(address,uint256)', [alice, web3.utils.toHex(dec(1, 'ether'))])
+  //   const tx2 = await mockBorrowerOperations.forward(activePool.address, sendETHData, { from: owner })
+  //   assert.isTrue(tx2.receipt.status)
 
-    const activePool_BalanceAfterTx = web3.utils.toBN(await web3.eth.getBalance(activePool.address))
-    const alice_Balance_AfterTx = web3.utils.toBN(await web3.eth.getBalance(alice))
+  //   const activePool_BalanceAfterTx = web3.utils.toBN(await web3.eth.getBalance(activePool.address))
+  //   const alice_Balance_AfterTx = web3.utils.toBN(await web3.eth.getBalance(alice))
 
-    const alice_BalanceChange = alice_Balance_AfterTx.sub(alice_Balance_BeforeTx)
-    const pool_BalanceChange = activePool_BalanceAfterTx.sub(activePool_BalanceBeforeTx)
-    assert.equal(alice_BalanceChange, dec(1, 'ether'))
-    assert.equal(pool_BalanceChange, _minus_1_Ether)
-  })
+  //   const alice_BalanceChange = alice_Balance_AfterTx.sub(alice_Balance_BeforeTx)
+  //   const pool_BalanceChange = activePool_BalanceAfterTx.sub(activePool_BalanceBeforeTx)
+  //   assert.equal(alice_BalanceChange, dec(1, 'ether'))
+  //   assert.equal(pool_BalanceChange, _minus_1_Ether)
+  // })
 })
 
 contract('DefaultPool', async accounts => {
