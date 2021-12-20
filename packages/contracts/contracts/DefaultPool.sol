@@ -24,27 +24,27 @@ contract DefaultPool is Ownable, CheckContract, ERC20Pool,  IDefaultPool {
 
     address public troveManagerAddress;
     address public activePoolAddress;
-    uint256 internal ETH;  // deposited ETH tracker
+    uint256 internal ERC20Coll;  // deposited ERC20 tracker
     uint256 internal LUSDDebt;  // debt
-
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event DefaultPoolLUSDDebtUpdated(uint _LUSDDebt);
-    event DefaultPoolETHBalanceUpdated(uint _ETH);
 
     // --- Dependency setters ---
 
     function setAddresses(
         address _troveManagerAddress,
-        address _activePoolAddress
+        address _activePoolAddress,
+        address _erc20CollateralTokenAddress
     )
         external
         onlyOwner
     {
         checkContract(_troveManagerAddress);
         checkContract(_activePoolAddress);
+        checkContract(_erc20CollateralTokenAddress);
 
         troveManagerAddress = _troveManagerAddress;
         activePoolAddress = _activePoolAddress;
+
+        _setERC20TokenAddress(_erc20CollateralTokenAddress);
 
         emit TroveManagerAddressChanged(_troveManagerAddress);
         emit ActivePoolAddressChanged(_activePoolAddress);
@@ -53,6 +53,13 @@ contract DefaultPool is Ownable, CheckContract, ERC20Pool,  IDefaultPool {
     }
 
     // --- Getters for public variables. Required by IPool interface ---
+
+    /*
+    * Returns the ERC20Coll state variable.
+    * Not necessarily equal to the the contract's raw ERC20 balance - it can be forcibly sent to contracts. */
+    function getERC20Coll() external view override returns (uint) {
+        return ERC20Coll;
+    }
 
     /*
     * Returns the ETH state variable.
@@ -68,6 +75,21 @@ contract DefaultPool is Ownable, CheckContract, ERC20Pool,  IDefaultPool {
     }
 
     // --- Pool functionality ---
+
+
+    function receiveERC20(uint _amount) 
+        external 
+        override 
+        returns (bool)
+    { 
+        _requireCallerIsActivePool();     
+
+        ERC20Coll = ERC20Coll.add(_amount);
+        emit DefaultPoolERC20BalanceUpdated(ERC20Coll);
+
+        bool success = IERC20(erc20TokenAddress).transferFrom(msg.sender, address(this), _amount);
+        require(success, "DefaultPool: receive ERC20 Collateral Failed");
+    }
 
     function sendERC20ToActivePool(uint _amount) external override { 
         _requireCallerIsTroveManager();
@@ -117,9 +139,9 @@ contract DefaultPool is Ownable, CheckContract, ERC20Pool,  IDefaultPool {
 
     // --- Fallback function ---
 
-    receive() external payable {
-        _requireCallerIsActivePool();
-        ETH = ETH.add(msg.value);
-        emit DefaultPoolETHBalanceUpdated(ETH);
-    }
+    // receive() external payable {
+    //     _requireCallerIsActivePool();
+    //     ETH = ETH.add(msg.value);
+    //     emit DefaultPoolETHBalanceUpdated(ETH);
+    // }
 }

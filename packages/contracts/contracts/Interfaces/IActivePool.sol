@@ -10,13 +10,12 @@ interface IActivePool is IPool {
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
     event ActivePoolLUSDDebtUpdated(uint _LUSDDebt);
-    // event ActivePoolETHBalanceUpdated(uint _ETH);
     event ActivePoolERC20BalanceUpdated(uint _amount);
 
     // --- Functions ---
     // function sendETH(address _account, uint _amount) external;
 
     function getERC20Coll() external view returns(uint);
-    function receiveERC20(uint _amount) external; 
+    function receiveERC20(uint _amount) external returns(bool); 
     function sendERC20(address _account, uint _amount) external; 
 }

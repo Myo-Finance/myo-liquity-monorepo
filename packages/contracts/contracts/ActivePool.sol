@@ -25,7 +25,7 @@ contract ActivePool is Ownable, CheckContract, ERC20Pool, IActivePool {
     address public troveManagerAddress;
     address public stabilityPoolAddress;
     address public defaultPoolAddress;
-    uint256 internal ERC20Coll;  // deposited ether tracker
+    uint256 internal ERC20Coll;  // deposited ERC20 tracker
     uint256 internal LUSDDebt;
 
     // --- Events ---
@@ -33,8 +33,6 @@ contract ActivePool is Ownable, CheckContract, ERC20Pool, IActivePool {
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
     event ActivePoolLUSDDebtUpdated(uint _LUSDDebt);
-    // event ActivePoolETHBalanceUpdated(uint _ETH);
-    // event ActivePoolERC20BalanceUpdated(uint _amount);
 
     // --- Contract setters ---
 
@@ -86,6 +84,7 @@ contract ActivePool is Ownable, CheckContract, ERC20Pool, IActivePool {
     function receiveERC20(uint _amount) 
         external
         override
+        returns (bool)
     {
         _requireCallerIsBorrowerOperationsOrDefaultPool();
 
@@ -94,6 +93,8 @@ contract ActivePool is Ownable, CheckContract, ERC20Pool, IActivePool {
         ERC20Coll = ERC20Coll.add(_amount);
         bool success = IERC20(erc20TokenAddress).transferFrom(msg.sender, address(this), _amount);
         require(success, "ActivePool: receiving ERC20 failed");
+
+        return success; 
     }
 
     function sendERC20(address _receiver, uint _amount) 
