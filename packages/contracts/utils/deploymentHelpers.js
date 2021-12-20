@@ -105,6 +105,14 @@ class DeploymentHelper {
       stabilityPool.address,
       borrowerOperations.address
     )
+
+    const daiToken = DAI_TOKEN_ADDRESS || await MockDAI.new(
+      "DAI Mock Stablecoin",
+      "MOCK_DAI",
+      ZERO_ADDRESS,
+      0
+    )
+
     LUSDToken.setAsDeployed(lusdToken)
     DefaultPool.setAsDeployed(defaultPool)
     PriceFeedTestnet.setAsDeployed(priceFeedTestnet)
@@ -159,7 +167,12 @@ class DeploymentHelper {
       testerContracts.borrowerOperations.address
     )
 
-    testerContracts.mockDAI = MockDAI.new();
+    // testerContracts.mockDAI = MockDAI.new(
+    //   "DAI Mock Stablecoin", 
+    //   "DAI",
+    //   ZERO_ADDRESS,
+    //   0
+    // )
 
     return testerContracts
   }
@@ -239,8 +252,17 @@ class DeploymentHelper {
       stabilityPool.address,
       borrowerOperations.address
     )
+
+    const mockDai = await MockDAI.new(
+      "DAI Mock Stablecoin",
+      "DAI",
+      0,
+      ZERO_ADDRESS 
+    )
+
     const coreContracts = {
       priceFeedTestnet,
+      mockDai,
       lusdToken,
       sortedTroves,
       troveManager,
@@ -373,9 +395,9 @@ class DeploymentHelper {
       LQTYContracts.lqtyStaking.address
     )
 
-    await contracts.borrowerOperations.setERC20Address(
-      contracts.mockDAI.address
-    )
+    // await contracts.borrowerOperations.setERC20Address(
+    //   contracts.mockDAI.address
+    // )
 
     // set contracts in the Pools
     await contracts.stabilityPool.setAddresses(
@@ -395,27 +417,15 @@ class DeploymentHelper {
       contracts.defaultPool.address
     )
 
-    contracts.activePool.setERC20TokenAddress(
-      contracts.mockDAI.address
-    )
-
     await contracts.defaultPool.setAddresses(
       contracts.troveManager.address,
       contracts.activePool.address,
-    )
-
-    contracts.defaultPool.setERC20TokenAddress(
-      contracts.mockDAI.address
     )
 
     await contracts.collSurplusPool.setAddresses(
       contracts.borrowerOperations.address,
       contracts.troveManager.address,
       contracts.activePool.address,
-    )
-
-    contracts.collSurplusPool.setERC20Address(
-      contracts.mockDAI.address
     )
 
     // set contracts in HintHelpers
