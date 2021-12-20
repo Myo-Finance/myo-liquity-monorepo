@@ -467,7 +467,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
 
     // ActivePool.receiveERC20(address, uint) will revert if not succesful. 
     function _activePoolAddColl(address _sender, IActivePool _activePool, uint _amount) internal {
-        _activePool.receiveERC20(_sender, _amount);
+        _activePool.receiveERC20(_amount);
     }
 
     // Issue the specified amount of LUSD to _account and increases the total active debt (_netDebtIncrease potentially includes a LUSDFee)

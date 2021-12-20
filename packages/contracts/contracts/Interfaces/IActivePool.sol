@@ -17,6 +17,6 @@ interface IActivePool is IPool {
     // function sendETH(address _account, uint _amount) external;
 
     function getERC20Coll() external view returns(uint);
-    function receiveERC20(address _sender, uint _amount) external; 
+    function receiveERC20(uint _amount) external; 
     function sendERC20(address _account, uint _amount) external; 
 }

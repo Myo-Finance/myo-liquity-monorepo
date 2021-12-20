@@ -13,6 +13,7 @@ import "../LUSDToken.sol";
 import "./PriceFeedTestnet.sol";
 import "../SortedTroves.sol";
 import "./EchidnaProxy.sol";
+
 //import "../Dependencies/console.sol";
 
 // Run with:
@@ -73,8 +74,9 @@ contract EchidnaTester {
             address(priceFeedTestnet), address(sortedTroves), 
             address(lusdToken), address(0));
 
+        //TODO: Use a proper ERC20 Mock to represent Collateral
         activePool.setAddresses(address(borrowerOperations), 
-            address(troveManager), address(stabilityPool), address(defaultPool));
+            address(troveManager), address(stabilityPool), address(defaultPool), address(0x0));
 
         defaultPool.setAddresses(address(troveManager), address(activePool));
         

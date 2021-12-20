@@ -42,7 +42,8 @@ contract ActivePool is Ownable, CheckContract, ERC20Pool, IActivePool {
         address _borrowerOperationsAddress,
         address _troveManagerAddress,
         address _stabilityPoolAddress,
-        address _defaultPoolAddress
+        address _defaultPoolAddress,
+        address _erc20CollateralTokenAddress
     )
         external
         onlyOwner
@@ -51,18 +52,20 @@ contract ActivePool is Ownable, CheckContract, ERC20Pool, IActivePool {
         checkContract(_troveManagerAddress);
         checkContract(_stabilityPoolAddress);
         checkContract(_defaultPoolAddress);
+        checkContract(_erc20CollateralTokenAddress);
 
         borrowerOperationsAddress = _borrowerOperationsAddress;
         troveManagerAddress = _troveManagerAddress;
         stabilityPoolAddress = _stabilityPoolAddress;
         defaultPoolAddress = _defaultPoolAddress;
 
+        _setERC20TokenAddress(_erc20CollateralTokenAddress);
+
         emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
         emit TroveManagerAddressChanged(_troveManagerAddress);
         emit StabilityPoolAddressChanged(_stabilityPoolAddress);
         emit DefaultPoolAddressChanged(_defaultPoolAddress);
 
-        _renounceOwnership();
     }
 
     // --- Getters for public variables. Required by IPool interface ---
@@ -80,7 +83,7 @@ contract ActivePool is Ownable, CheckContract, ERC20Pool, IActivePool {
 
     // --- Pool functionality ---
 
-    function receiveERC20(address _sender, uint _amount) 
+    function receiveERC20(uint _amount) 
         external
         override
     {
@@ -89,7 +92,7 @@ contract ActivePool is Ownable, CheckContract, ERC20Pool, IActivePool {
         emit ActivePoolERC20BalanceUpdated(_amount);
 
         ERC20Coll = ERC20Coll.add(_amount);
-        bool success = IERC20(erc20TokenAddress).transferFrom(_sender, address(this), _amount);
+        bool success = IERC20(erc20TokenAddress).transferFrom(msg.sender, address(this), _amount);
         require(success, "ActivePool: receiving ERC20 failed");
     }
 

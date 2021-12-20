@@ -40,27 +40,31 @@ contract('StabilityPool', async accounts => {
 
 contract('ActivePool', async accounts => {
 
-  let activePool, mockBorrowerOperations
+  let activePool, mockBorrowerOperations, mockDai;
 
   const [owner, alice] = accounts;
   beforeEach(async () => {
     activePool = await ActivePool.new()
     mockBorrowerOperations = await NonPayable.new()
     mockDai = await MockDAI.new(
-      "PAI Stablecoin",
-      "PAI",
+      "DAI Stablecoin",
+      "DAI",
       owner,
       BigNumber.from("1000")
     )
     const dumbContractAddress = (await NonPayable.new()).address
-    await activePool.setAddresses(mockBorrowerOperations.address, dumbContractAddress, dumbContractAddress, dumbContractAddress)
-    await activePool.setERC20TokenAddress(mockDai.address)
+    await activePool.setAddresses(mockBorrowerOperations.address, dumbContractAddress, dumbContractAddress, dumbContractAddress, mockDai.address)
   })
 
-  it('erc20TokenAddress(): is not 0x0 address', async () => {
-    const erc20CollateralAddress = await activePool.erc20CollateralAddress();
-    assert.not.equal(erc20CollateralAddress, 0);
+  it('erc20TokenAddress(): is set correctly', async () => {
+    const erc20CollateralAddress = await activePool.getERC20TokenAddress();
+    assert.equal(erc20CollateralAddress, mockDai.address);
   })
+
+  it('getERC20Balance(): gets the recorded ERC20 collateral balance', async () => {
+    const recordedERC20Balance = await activePool.getERC20Coll()
+    assert.equal(recordedERC20Balance, 0);
+  });
 
   // it('getETH(): gets the recorded ETH balance', async () => {
   //   const recordedETHBalance = await activePool.getETH()
@@ -68,8 +72,8 @@ contract('ActivePool', async accounts => {
   // })
 
   it('getLUSDDebt(): gets the recorded LUSD balance', async () => {
-    const recordedETHBalance = await activePool.getLUSDDebt()
-    assert.equal(recordedETHBalance, 0)
+    const recordedLUSDBalance = await activePool.getLUSDDebt()
+    assert.equal(recordedLUSDBalance, 0)
   })
  
   it('increaseLUSD(): increases the recorded LUSD balance by the correct amount', async () => {
@@ -83,6 +87,7 @@ contract('ActivePool', async accounts => {
     const recordedLUSD_balanceAfter = await activePool.getLUSDDebt()
     assert.equal(recordedLUSD_balanceAfter, 100)
   })
+
   // Decrease
   it('decreaseLUSD(): decreases the recorded LUSD balance by the correct amount', async () => {
     // start the pool on 100 wei
@@ -100,6 +105,21 @@ contract('ActivePool', async accounts => {
     assert.isTrue(tx2.receipt.status)
     const recordedLUSD_balanceAfter = await activePool.getLUSDDebt()
     assert.equal(recordedLUSD_balanceAfter, 0)
+  })
+
+  it('sendERC20(): decreases the recorded ERC20 balance by the correct amount', async () => {
+
+    // Setup
+    // activePool.receiveERC20(BigNumber.from(1), {from: mockBorrowerOperations});
+    const receiveER20Data = th.getTransactionData('receiveERC20(uint)', ['0x64'])
+    const tx1 = await mockBorrowerOperations.forward(activePool.address, receiveER20Data)
+    assert.isTrue(tx1.receipt.status)
+
+    const recordedERC20Balance = await activePool.getERC20Coll()
+    assert.equal(recordedERC20Balance, 100);
+
+
+
   })
 
   // send raw ether
