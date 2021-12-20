@@ -21,8 +21,9 @@ contract CollSurplusPool is Ownable, CheckContract, ICollSurplusPool {
 
     address public erc20TokenAddress;
 
-    // deposited ether tracker
-    uint256 internal ETH;
+    // deposited ERC20 tracker
+    uint256 internal ERC20Coll;
+
     // Collateral surplus claimable by trove owners
     mapping (address => uint) internal balances;
 
@@ -40,7 +41,8 @@ contract CollSurplusPool is Ownable, CheckContract, ICollSurplusPool {
     function setAddresses(
         address _borrowerOperationsAddress,
         address _troveManagerAddress,
-        address _activePoolAddress
+        address _activePoolAddress,
+        address _erc20TokenAddress
     )
         external
         override
@@ -53,20 +55,14 @@ contract CollSurplusPool is Ownable, CheckContract, ICollSurplusPool {
         borrowerOperationsAddress = _borrowerOperationsAddress;
         troveManagerAddress = _troveManagerAddress;
         activePoolAddress = _activePoolAddress;
+        erc20TokenAddress = _erc20TokenAddress;
+
 
         emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
         emit TroveManagerAddressChanged(_troveManagerAddress);
         emit ActivePoolAddressChanged(_activePoolAddress);
 
         _renounceOwnership();
-    }
-
-    function setERC20Address(address _erc20TokenAddress)
-        external
-        override
-        onlyOwner
-    {
-        erc20TokenAddress = _erc20TokenAddress;
     }
 
     /* Returns the ERC20 state variable at ActivePool address.
@@ -86,6 +82,17 @@ contract CollSurplusPool is Ownable, CheckContract, ICollSurplusPool {
 
     // --- Pool functionality ---
 
+    function receiveERC20(uint _amount)
+        override
+        external
+    {
+        _requireCallerIsActivePool();
+        ERC20Coll = ERC20Coll.add(_amount);
+
+        bool success = IERC20(erc20TokenAddress).transferFrom(msg.sender, address(this), _amount);
+        require(success, "CollSurplusPool: receiveERC20 failed");
+    }
+
     function accountSurplus(address _account, uint _amount) external override {
         _requireCallerIsTroveManager();
 
@@ -104,11 +111,12 @@ contract CollSurplusPool is Ownable, CheckContract, ICollSurplusPool {
         emit CollBalanceUpdated(_account, 0);
 
         // ETH = ETH.sub(claimableColl);
+        ERC20Coll = ERC20Coll.sub(claimableColl);
         emit ERC20Sent(_account, claimableColl);
 
-        bool success = IERC20(erc20TokenAddress).transfer(_account, claimableColl);
         // (bool success, ) = _account.call{ value: claimableColl }("");
-        require(success, "CollSurplusPool: sending ETH failed");
+        bool success = IERC20(erc20TokenAddress).transfer(_account, claimableColl);
+        require(success, "CollSurplusPool: sending ERC20 failed");
     }
 
     // --- 'require' functions ---

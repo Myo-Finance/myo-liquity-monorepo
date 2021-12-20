@@ -76,16 +76,18 @@ contract EchidnaTester {
 
         //TODO: Use a proper ERC20 Mock to represent Collateral
         activePool.setAddresses(address(borrowerOperations), 
-            address(troveManager), address(stabilityPool), address(defaultPool), address(0x0));
+            address(troveManager), address(stabilityPool), address(defaultPool), address(0));
 
-        defaultPool.setAddresses(address(troveManager), address(activePool));
+        //TODO: Use a proper ERC20 Mock to represent Collateral
+        defaultPool.setAddresses(address(troveManager), address(activePool), address(0));
         
         stabilityPool.setAddresses(address(borrowerOperations), 
             address(troveManager), address(activePool), address(lusdToken), 
             address(sortedTroves), address(priceFeedTestnet), address(0));
 
+        //TODO: Use a proper ERC20 Mock to represent Collateral
         collSurplusPool.setAddresses(address(borrowerOperations), 
-             address(troveManager), address(activePool));
+             address(troveManager), address(activePool), address(0));
     
         sortedTroves.setParams(1e18, address(troveManager), address(borrowerOperations));
 

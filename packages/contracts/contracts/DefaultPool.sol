@@ -95,9 +95,9 @@ contract DefaultPool is Ownable, CheckContract, ERC20Pool,  IDefaultPool {
         _requireCallerIsTroveManager();
         address activePool = activePoolAddress; // cache to save an SLOAD
 
-        uint balance = IERC20(erc20TokenAddress).balanceOf(address(this)).sub(_amount);
+        ERC20Coll = ERC20Coll.sub(_amount);
+        emit DefaultPoolERC20BalanceUpdated(ERC20Coll);
 
-        emit DefaultPoolERC20BalanceUpdated(balance);
         emit ERC20Sent(activePool, _amount);
 
         bool success = IERC20(erc20TokenAddress).transfer(activePool, _amount);

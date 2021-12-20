@@ -20,12 +20,12 @@ interface ICollSurplusPool {
     function setAddresses(
         address _borrowerOperationsAddress,
         address _troveManagerAddress,
-        address _activePoolAddress
+        address _activePoolAddress,
+        address _erc20TokenAddress
     ) external;
 
-    function setERC20Address(address _erc20TokenAddress) external; 
+    function receiveERC20(uint _amout) external;
 
-    // function getETH() external view returns (uint);
     function getERC20Balance() external view returns (uint);
 
     function getCollateral(address _account) external view returns (uint);

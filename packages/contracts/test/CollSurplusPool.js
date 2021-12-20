@@ -46,9 +46,10 @@ contract('CollSurplusPool', async accounts => {
     await deploymentHelper.connectLQTYContractsToCore(LQTYContracts, contracts)
   })
 
-  it("CollSurplusPool::getETH(): Returns the ETH balance of the CollSurplusPool after redemption", async () => {
-    const ETH_1 = await collSurplusPool.getETH()
-    assert.equal(ETH_1, '0')
+  it("CollSurplusPool::getERC20Balance(): Returns the ERC20 balance of the CollSurplusPool after redemption", async () => {
+
+    const ERC20_1 = await collSurplusPool.getERC20Balance();
+    assert.equal(ERC20_1, '0');
 
     const price = toBN(dec(100, 18))
     await priceFeed.setPrice(price)
@@ -59,12 +60,33 @@ contract('CollSurplusPool', async accounts => {
     // skip bootstrapping phase
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
 
-    // At ETH:USD = 100, this redemption should leave 1 ether of coll surplus
+    // At DAI:PAI = 100, this redemption should leave 1 dai of coll surplus
     await th.redeemCollateralAndGetTxObject(A, contracts, B_netDebt)
 
-    const ETH_2 = await collSurplusPool.getETH()
-    th.assertIsApproximatelyEqual(ETH_2, B_coll.sub(B_netDebt.mul(mv._1e18BN).div(price)))
+    const ERC20_2 = await collSurplusPool.getETH()
+    th.assertIsApproximatelyEqual(ERC20_2, B_coll.sub(B_netDebt.mul(mv._1e18BN).div(price)))
+
   })
+
+  // it("CollSurplusPool::getETH(): Returns the ETH balance of the CollSurplusPool after redemption", async () => {
+  //   const ETH_1 = await collSurplusPool.getETH()
+  //   assert.equal(ETH_1, '0')
+
+  //   const price = toBN(dec(100, 18))
+  //   await priceFeed.setPrice(price)
+
+  //   const { collateral: B_coll, netDebt: B_netDebt } = await openTrove({ ICR: toBN(dec(200, 16)), extraParams: { from: B } })
+  //   await openTrove({ extraLUSDAmount: B_netDebt, extraParams: { from: A, value: dec(3000, 'ether') } })
+
+  //   // skip bootstrapping phase
+  //   await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
+
+  //   // At ETH:USD = 100, this redemption should leave 1 ether of coll surplus
+  //   await th.redeemCollateralAndGetTxObject(A, contracts, B_netDebt)
+
+  //   const ETH_2 = await collSurplusPool.getETH()
+  //   th.assertIsApproximatelyEqual(ETH_2, B_coll.sub(B_netDebt.mul(mv._1e18BN).div(price)))
+  // })
 
   it("CollSurplusPool: claimColl(): Reverts if caller is not Borrower Operations", async () => {
     await th.assertRevert(collSurplusPool.claimColl(A, { from: A }), 'CollSurplusPool: Caller is not Borrower Operations')

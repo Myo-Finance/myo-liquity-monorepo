@@ -185,14 +185,20 @@ contract('ActivePool', async accounts => {
 
 contract('DefaultPool', async accounts => {
  
-  let defaultPool, mockTroveManager, mockActivePool
+  let defaultPool, mockTroveManager, mockActivePool, dai
 
   const [owner, alice] = accounts;
   beforeEach(async () => {
     defaultPool = await DefaultPool.new()
     mockTroveManager = await NonPayable.new()
     mockActivePool = await NonPayable.new()
-    await defaultPool.setAddresses(mockTroveManager.address, mockActivePool.address)
+    dai = await MockDAI.new(
+      "DAI Stablecoin",
+      "DAI",
+      owner,
+      BigNumber.from("1000")
+    )
+    await defaultPool.setAddresses(mockTroveManager.address, mockActivePool.address, dai.address)
   })
 
   it('getERC20Coll(): gets the recorded ERC20 Collateral balance', async () => {
@@ -235,6 +241,54 @@ contract('DefaultPool', async accounts => {
 
     const recordedLUSD_balanceAfter = await defaultPool.getLUSDDebt()
     assert.equal(recordedLUSD_balanceAfter, 0)
+  })
+
+  it("receiveERC20(): receive ERC20 from ActivePool and increment local ERC20 tracker", async () => {
+    // Setup
+    await dai.mint(mockActivePool.address, 100);
+
+    const approveData = th.getTransactionData('approve(address,uint256)', [defaultPool.address, '0x64']);
+    await mockActivePool.forward(dai.address, approveData);
+
+    // Preconditions
+    const before_ERC20RecordedBalance = await defaultPool.getERC20Coll()
+    assert.equal(before_ERC20RecordedBalance, 0)
+
+    // Execute 
+    const receiveER20Data = th.getTransactionData('receiveERC20(uint256)', ['0x64']);
+    const tx1 = await mockActivePool.forward(defaultPool.address, receiveER20Data);
+
+    // Verify 
+    const recordedERC20Balance = await defaultPool.getERC20Coll()
+    assert.equal(recordedERC20Balance, 100);
+
+  });
+
+  it("sendERC20ToActivePool(): sends ERC20 tokens to ActivePool and records new balance in local tracker correctly", async () => {
+
+    // Setup
+    await dai.mint(mockActivePool.address, 100);
+
+    const approveData = th.getTransactionData('approve(address,uint256)', [defaultPool.address, '0x64']);
+    await mockActivePool.forward(dai.address, approveData);
+
+    const receiveER20Data = th.getTransactionData('receiveERC20(uint256)', ['0x64']);
+    const tx1 = await mockActivePool.forward(defaultPool.address, receiveER20Data);
+
+    // Preconditions
+    const before_defaultPoolRecordedBalance = await defaultPool.getERC20Coll()
+    assert.equal(before_defaultPoolRecordedBalance, 100);
+
+    // Execute
+
+    const sendERC20ToActivePoolData = th.getTransactionData('sendERC20ToActivePool(uint256)', ['0x64'])
+    const tx2 = await mockTroveManager.forward(defaultPool.address, sendERC20ToActivePoolData)
+
+    // Verify
+
+    const after_defaultPoolRecordedBalance = await defaultPool.getERC20Coll()
+    assert.equal(after_defaultPoolRecordedBalance, 0);
+
   })
 
   // send raw ether
