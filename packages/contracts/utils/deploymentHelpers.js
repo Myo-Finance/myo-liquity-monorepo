@@ -62,12 +62,15 @@ LQTY contracts consist of only those contracts related to the LQTY Token:
 const ZERO_ADDRESS = '0x' + '0'.repeat(40)
 const maxBytes32 = '0x' + 'f'.repeat(64)
 
+
 class DeploymentHelper {
 
   static async deployLiquityCore() {
     const cmdLineArgs = process.argv
     const frameworkPath = cmdLineArgs[1]
-    // console.log(`Framework used:  ${frameworkPath}`)
+
+    console.log(`Framework used:  ${frameworkPath}`)
+    console.log(`cmd line args: ${cmdLineArgs}`)
 
     if (frameworkPath.includes("hardhat")) {
       return this.deployLiquityCoreHardhat()
@@ -106,7 +109,7 @@ class DeploymentHelper {
       borrowerOperations.address
     )
 
-    const daiToken = DAI_TOKEN_ADDRESS || await MockDAI.new(
+    const gemToken = GEM_TOKEN_ADDRESS || await MockDAI.new(
       "DAI Mock Stablecoin",
       "MOCK_DAI",
       ZERO_ADDRESS,
