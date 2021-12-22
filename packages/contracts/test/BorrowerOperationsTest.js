@@ -101,6 +101,9 @@ contract('BorrowerOperations', async accounts => {
       LUSD_GAS_COMPENSATION = await borrowerOperations.LUSD_GAS_COMPENSATION()
       MIN_NET_DEBT = await borrowerOperations.MIN_NET_DEBT()
       BORROWING_FEE_FLOOR = await borrowerOperations.BORROWING_FEE_FLOOR()
+
+      contracts.gemToken.mint(alice, toBN(dec(10, 18)))
+      contracts.gemToken.mint(bob, toBN(dec(10, 18)))
     })
 
     it("addColl(): reverts when top-up would leave trove with ICR < MCR", async () => {

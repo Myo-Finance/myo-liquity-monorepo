@@ -234,6 +234,19 @@
   },
   {
     "inputs": [],
+    "name": "getERC20Coll",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "getERC20TokenAddress",
     "outputs": [
       {
@@ -314,7 +327,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_sender",
+        "name": "sender",
         "type": "address"
       },
       {
@@ -324,7 +337,13 @@
       }
     ],
     "name": "receiveERC20",
-    "outputs": [],
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -366,6 +385,11 @@
       {
         "internalType": "address",
         "name": "_defaultPoolAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_erc20CollateralTokenAddress",
         "type": "address"
       }
     ],

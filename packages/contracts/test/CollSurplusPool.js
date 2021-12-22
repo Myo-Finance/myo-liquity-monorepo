@@ -62,19 +62,19 @@ contract('CollSurplusPool', async accounts => {
     await contracts.gemToken.mint(A, dec(3000, 'ether'))
     await contracts.gemToken.mint(B, dec(3000, 'ether'))
 
-    console.log({
-      A,
-      B,
-      bo: contracts.borrowerOperations.address,
-      ap: contracts.activePool.address,
-      cs: contracts.collSurplusPool.address
-    })
+    // console.log({
+    //   A,
+    //   B,
+    //   bo: contracts.borrowerOperations.address,
+    //   ap: contracts.activePool.address,
+    //   cs: contracts.collSurplusPool.address
+    // })
 
     contracts.gemToken.approve(contracts.activePool.address, dec(3000, 'ether'), { from: A })
     contracts.gemToken.approve(contracts.activePool.address, dec(3000, 'ether'), { from: B })
 
     const { collateral: B_coll, netDebt: B_netDebt } = await openTrove({ ICR: toBN(dec(200, 16)), extraParams: { from: B } })
-    await openTrove({ extraLUSDAmount: B_netDebt, extraParams: { from: A, value: dec(3000, 'ether') } })
+    await openTrove({ extraLUSDAmount: B_netDebt, extraParams: { from: A } })
 
     // skip bootstrapping phase
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
@@ -82,7 +82,17 @@ contract('CollSurplusPool', async accounts => {
     // At DAI:PAI = 100, this redemption should leave 1 dai of coll surplus
     await th.redeemCollateralAndGetTxObject(A, contracts, B_netDebt)
 
-    const ERC20_2 = await collSurplusPool.getETH()
+    const ERC20_2 = await collSurplusPool.getERC20Balance()
+
+    console.log({
+      ERC20_2: ERC20_2.toString(), 
+      B_coll: B_coll.toString(),
+      B_netDebt: B_netDebt.toString(),
+      '1e18': mv._1e18BN.toString(),
+      price: price.toString(),
+      result: B_coll.sub(B_netDebt.mul(mv._1e18BN).div(price)).toString()
+    })
+
     th.assertIsApproximatelyEqual(ERC20_2, B_coll.sub(B_netDebt.mul(mv._1e18BN).div(price)))
 
   })

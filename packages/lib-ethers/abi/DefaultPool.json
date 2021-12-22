@@ -44,19 +44,6 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_ETH",
-        "type": "uint256"
-      }
-    ],
-    "name": "DefaultPoolETHBalanceUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
         "name": "_LUSDDebt",
         "type": "uint256"
       }
@@ -221,6 +208,19 @@
   },
   {
     "inputs": [],
+    "name": "getERC20Coll",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "getERC20TokenAddress",
     "outputs": [
       {
@@ -305,6 +305,25 @@
         "type": "uint256"
       }
     ],
+    "name": "receiveERC20",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
     "name": "sendERC20ToActivePool",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -320,6 +339,11 @@
       {
         "internalType": "address",
         "name": "_activePoolAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_erc20CollateralTokenAddress",
         "type": "address"
       }
     ],
@@ -353,9 +377,5 @@
     ],
     "stateMutability": "view",
     "type": "function"
-  },
-  {
-    "stateMutability": "payable",
-    "type": "receive"
   }
 ]

@@ -88,10 +88,6 @@ contract ActivePool is Ownable, CheckContract, ERC20Pool, IActivePool {
     {
         _requireCallerIsBorrowerOperationsOrDefaultPool();
 
-        console.log(sender);
-        console.log(msg.sender);
-        console.log(_amount);
-
         emit ActivePoolERC20BalanceUpdated(_amount);
 
         ERC20Coll = ERC20Coll.add(_amount);

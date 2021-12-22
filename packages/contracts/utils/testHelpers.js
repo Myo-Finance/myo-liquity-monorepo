@@ -676,14 +676,14 @@ class TestHelper {
     if (!upperHint) upperHint = this.ZERO_ADDRESS
     if (!lowerHint) lowerHint = this.ZERO_ADDRESS
 
-    console.log({
-      maxFeePercentage,
-      extraLUSDAmount,
-      upperHint,
-      lowerHint,
-      ICR,
-      extraParams
-    })
+    // console.log({
+    //   maxFeePercentage,
+    //   extraLUSDAmount,
+    //   upperHint,
+    //   lowerHint,
+    //   ICR,
+    //   extraParams
+    // })
 
     // console.log("ICR:", web3.utils.fromWei(ICR))
 
@@ -1004,7 +1004,7 @@ class TestHelper {
       exactPartialRedemptionHint[1],
       partialRedemptionNewICR,
       0, maxFee,
-      { from: redeemer, gasPrice: 0 },
+      { from: redeemer },
     )
 
     return tx

@@ -717,22 +717,14 @@
         "internalType": "address",
         "name": "_lqtyStakingAddress",
         "type": "address"
-      }
-    ],
-    "name": "setAddresses",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
+      },
       {
         "internalType": "address",
         "name": "_erc20TokenAddress",
         "type": "address"
       }
     ],
-    "name": "setERC20Address",
+    "name": "setAddresses",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
