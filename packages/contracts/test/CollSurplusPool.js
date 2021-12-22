@@ -46,6 +46,11 @@ contract('CollSurplusPool', async accounts => {
     await deploymentHelper.connectLQTYContractsToCore(LQTYContracts, contracts)
   })
 
+  it("CollSurplusPool::getERC20Token(): is set correctly", async () => {
+    const erc20Gem = await collSurplusPool.erc20TokenAddress()
+    assert.notEqual(erc20Gem, "0");
+  })
+
   it("CollSurplusPool::getERC20Balance(): Returns the ERC20 balance of the CollSurplusPool after redemption", async () => {
 
     const ERC20_1 = await collSurplusPool.getERC20Balance();
@@ -53,6 +58,20 @@ contract('CollSurplusPool', async accounts => {
 
     const price = toBN(dec(100, 18))
     await priceFeed.setPrice(price)
+
+    await contracts.gemToken.mint(A, dec(3000, 'ether'))
+    await contracts.gemToken.mint(B, dec(3000, 'ether'))
+
+    console.log({
+      A,
+      B,
+      bo: contracts.borrowerOperations.address,
+      ap: contracts.activePool.address,
+      cs: contracts.collSurplusPool.address
+    })
+
+    contracts.gemToken.approve(contracts.activePool.address, dec(3000, 'ether'), { from: A })
+    contracts.gemToken.approve(contracts.activePool.address, dec(3000, 'ether'), { from: B })
 
     const { collateral: B_coll, netDebt: B_netDebt } = await openTrove({ ICR: toBN(dec(200, 16)), extraParams: { from: B } })
     await openTrove({ extraLUSDAmount: B_netDebt, extraParams: { from: A, value: dec(3000, 'ether') } })

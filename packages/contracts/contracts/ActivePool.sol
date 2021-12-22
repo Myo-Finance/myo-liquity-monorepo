@@ -81,17 +81,21 @@ contract ActivePool is Ownable, CheckContract, ERC20Pool, IActivePool {
 
     // --- Pool functionality ---
 
-    function receiveERC20(uint _amount) 
+    function receiveERC20(address sender, uint _amount) 
         external
         override
         returns (bool)
     {
         _requireCallerIsBorrowerOperationsOrDefaultPool();
 
+        console.log(sender);
+        console.log(msg.sender);
+        console.log(_amount);
+
         emit ActivePoolERC20BalanceUpdated(_amount);
 
         ERC20Coll = ERC20Coll.add(_amount);
-        bool success = IERC20(erc20TokenAddress).transferFrom(msg.sender, address(this), _amount);
+        bool success = IERC20(erc20TokenAddress).transferFrom(sender, address(this), _amount);
         require(success, "ActivePool: receiving ERC20 failed");
 
         return success; 

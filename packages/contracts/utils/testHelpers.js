@@ -676,6 +676,17 @@ class TestHelper {
     if (!upperHint) upperHint = this.ZERO_ADDRESS
     if (!lowerHint) lowerHint = this.ZERO_ADDRESS
 
+    console.log({
+      maxFeePercentage,
+      extraLUSDAmount,
+      upperHint,
+      lowerHint,
+      ICR,
+      extraParams
+    })
+
+    // console.log("ICR:", web3.utils.fromWei(ICR))
+
     const MIN_DEBT = (
       await this.getNetBorrowingAmount(contracts, await contracts.borrowerOperations.MIN_NET_DEBT())
     ).add(this.toBN(1)) // add 1 to avoid rounding issues
@@ -687,19 +698,23 @@ class TestHelper {
     const totalDebt = await this.getOpenTroveTotalDebt(contracts, lusdAmount)
     const netDebt = await this.getActualDebtFromComposite(totalDebt, contracts)
 
+    let ERC20Amount = 0
+
     if (ICR) {
       const price = await contracts.priceFeedTestnet.getPrice()
-      extraParams.value = ICR.mul(totalDebt).div(price)
+      // extraParams.value = ICR.mul(totalDebt).div(price)
+      ERC20Amount = ICR.mul(totalDebt).div(price)
     }
 
-    const tx = await contracts.borrowerOperations.openTrove(maxFeePercentage, lusdAmount, upperHint, lowerHint, extraParams)
+    // console.log({maxFeePercentage, lusdAmount: web3.utils.fromWei(lusdAmount), ERC20Amount: web3.utils.fromWei(ERC20Amount), upperHint, lowerHint, extraParams})
+    const tx = await contracts.borrowerOperations.openTrove(maxFeePercentage, lusdAmount, ERC20Amount, upperHint, lowerHint, extraParams)
 
     return {
       lusdAmount,
       netDebt,
       totalDebt,
       ICR,
-      collateral: extraParams.value,
+      collateral: ERC20Amount,
       tx
     }
   }

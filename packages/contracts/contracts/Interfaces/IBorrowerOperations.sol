@@ -34,12 +34,11 @@ interface IBorrowerOperations {
         address _priceFeedAddress,
         address _sortedTrovesAddress,
         address _lusdTokenAddress,
-        address _lqtyStakingAddress
+        address _lqtyStakingAddress,
+        address _erc20TokenAddress
     ) external;
 
     function erc20TokenAddress() external returns (address); 
-
-    function setERC20Address(address _erc20TokenAddress) external; 
 
     function openTrove(uint _maxFee, uint _LUSDAmount, uint _ERC20Amount, address _upperHint, address _lowerHint) external;
 

@@ -108,7 +108,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         address _priceFeedAddress,
         address _sortedTrovesAddress,
         address _lusdTokenAddress,
-        address _lqtyStakingAddress
+        address _lqtyStakingAddress,
+        address _erc20TokenAddress
     )
         external
         override
@@ -127,6 +128,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         checkContract(_sortedTrovesAddress);
         checkContract(_lusdTokenAddress);
         checkContract(_lqtyStakingAddress);
+        checkContract(_erc20TokenAddress);
 
         troveManager = ITroveManager(_troveManagerAddress);
         activePool = IActivePool(_activePoolAddress);
@@ -140,6 +142,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         lqtyStakingAddress = _lqtyStakingAddress;
         lqtyStaking = ILQTYStaking(_lqtyStakingAddress);
 
+        erc20TokenAddress = _erc20TokenAddress;
+
         emit TroveManagerAddressChanged(_troveManagerAddress);
         emit ActivePoolAddressChanged(_activePoolAddress);
         emit DefaultPoolAddressChanged(_defaultPoolAddress);
@@ -152,14 +156,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         emit LQTYStakingAddressChanged(_lqtyStakingAddress);
 
         _renounceOwnership();
-    }
-
-    function setERC20Address(address _erc20TokenAddress) 
-        external
-        override
-        onlyOwner
-    {
-        erc20TokenAddress = _erc20TokenAddress;
     }
 
     // --- Borrower Trove Operations ---
@@ -209,6 +205,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         sortedTroves.insert(msg.sender, vars.NICR, _upperHint, _lowerHint);
         vars.arrayIndex = contractsCache.troveManager.addTroveOwnerToArray(msg.sender);
         emit TroveCreated(msg.sender, vars.arrayIndex);
+
 
         // Move ERC20 collateral to the Active Pool, and mint the LUSDAmount to the borrower
         _activePoolAddColl(msg.sender, contractsCache.activePool, _ERC20Amount);
@@ -467,7 +464,11 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
 
     // ActivePool.receiveERC20(address, uint) will revert if not succesful. 
     function _activePoolAddColl(address _sender, IActivePool _activePool, uint _amount) internal {
-        _activePool.receiveERC20(_amount);
+        // IERC20(erc20TokenAddress).approve(address(_activePool), _amount);
+
+        // Get Collateral from trove Owner
+        // IERC20(erc20TokenAddress).transferFrom(_sender, address(_activePool), _amount);
+        _activePool.receiveERC20(_sender, _amount);
     }
 
     // Issue the specified amount of LUSD to _account and increases the total active debt (_netDebtIncrease potentially includes a LUSDFee)

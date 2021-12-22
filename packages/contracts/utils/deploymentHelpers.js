@@ -49,6 +49,8 @@ const {
   LQTYStakingProxy
 } = require('../utils/proxyHelpers.js')
 
+const hardhat = require('hardhat');
+
 /* "Liquity core" consists of all contracts in the core Liquity system.
 
 LQTY contracts consist of only those contracts related to the LQTY Token:
@@ -69,8 +71,8 @@ class DeploymentHelper {
     const cmdLineArgs = process.argv
     const frameworkPath = cmdLineArgs[1]
 
-    console.log(`Framework used:  ${frameworkPath}`)
-    console.log(`cmd line args: ${cmdLineArgs}`)
+    // console.log(`Framework used:  ${frameworkPath}`)
+    // console.log(`cmd line args: ${cmdLineArgs}`)
 
     if (frameworkPath.includes("hardhat")) {
       return this.deployLiquityCoreHardhat()
@@ -92,6 +94,7 @@ class DeploymentHelper {
   }
 
   static async deployLiquityCoreHardhat() {
+
     const priceFeedTestnet = await PriceFeedTestnet.new()
     const sortedTroves = await SortedTroves.new()
     const troveManager = await TroveManager.new()
@@ -109,7 +112,8 @@ class DeploymentHelper {
       borrowerOperations.address
     )
 
-    const gemToken = GEM_TOKEN_ADDRESS || await MockDAI.new(
+    const GEM_ERC20 = await hardhat.getNamedAccounts("GEM_ERC20");
+    const gemToken = Object.keys(GEM_ERC20).length ? GEM_ERC20 : await MockDAI.new(
       "DAI Mock Stablecoin",
       "MOCK_DAI",
       ZERO_ADDRESS,
@@ -141,7 +145,8 @@ class DeploymentHelper {
       collSurplusPool,
       functionCaller,
       borrowerOperations,
-      hintHelpers
+      hintHelpers,
+      gemToken
     }
     return coreContracts
   }
@@ -395,12 +400,9 @@ class DeploymentHelper {
       contracts.priceFeedTestnet.address,
       contracts.sortedTroves.address,
       contracts.lusdToken.address,
-      LQTYContracts.lqtyStaking.address
+      LQTYContracts.lqtyStaking.address,
+      contracts.gemToken.address
     )
-
-    // await contracts.borrowerOperations.setERC20Address(
-    //   contracts.mockDAI.address
-    // )
 
     // set contracts in the Pools
     await contracts.stabilityPool.setAddresses(
@@ -417,18 +419,21 @@ class DeploymentHelper {
       contracts.borrowerOperations.address,
       contracts.troveManager.address,
       contracts.stabilityPool.address,
-      contracts.defaultPool.address
+      contracts.defaultPool.address,
+      contracts.gemToken.address
     )
 
     await contracts.defaultPool.setAddresses(
       contracts.troveManager.address,
       contracts.activePool.address,
+      contracts.gemToken.address
     )
 
     await contracts.collSurplusPool.setAddresses(
       contracts.borrowerOperations.address,
       contracts.troveManager.address,
       contracts.activePool.address,
+      contracts.gemToken.address
     )
 
     // set contracts in HintHelpers
