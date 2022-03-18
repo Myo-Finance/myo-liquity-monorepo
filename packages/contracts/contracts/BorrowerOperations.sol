@@ -180,10 +180,16 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         vars.NICR = LiquityMath._computeNominalCR(msg.value, vars.compositeDebt);
 
         if (isRecoveryMode) {
+            // In recovery mode, only troves with ICR >= CCR 
+            // can be opened
             _requireICRisAboveCCR(vars.ICR);
         } else {
+            
+            // new trove's ICR can't be below minimum required
             _requireICRisAboveMCR(vars.ICR);
             uint newTCR = _getNewTCRFromTroveChange(msg.value, true, vars.compositeDebt, true, vars.price);  // bools: coll increase, debt increase
+            
+            // New trove must raise TCR avobe CCR
             _requireNewTCRisAboveCCR(newTCR); 
         }
 
